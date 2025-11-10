@@ -1,52 +1,57 @@
-1. Base du jeu
+# Labyrinthe SDL
 
-Affichage du labyrinthe SDL
+Un jeu de labyrinthe en 2D avec gestion du joueur, objets interactifs, pièges et interface console, développé en C avec (SDL).
 
-Déplacements du joueur via les touches ZQSD ou les flèches directionnelles.
+## Description
 
-Détection des collisions avec les murs et les limites de la carte.
+Ce projet est un jeu de labyrinthe où le joueur doit naviguer à travers un labyrinthe généré aléatoirement, éviter les pièges, collecter des objets et atteindre la sortie pour gagner.
 
-Gestion des points de vie et de la position du joueur.
+## Fonctionnalités
 
-2. Génération et gestion du labyrinthe
+### 1. Base du jeu
+- **Affichage du labyrinthe** : Rendu graphique du labyrinthe via SDL.
+- **Contrôles du joueur** : Déplacements avec les touches **ZQSD**/**wASD** ou les **flèches directionnelles**.
+- **Collisions** : Détection des collisions avec les murs et les limites de la carte.
+- **Gestion du joueur** : Suivi des **points de vie** et de la **position** du joueur.
 
-Création aléatoire d’un labyrinthe (murs, sols, sortie).
+### 2. Génération et gestion du labyrinthe
+- **Génération aléatoire** : Création d'un labyrinthe avec des murs, des sols et une sortie.
+- **Sauvegarde/Chargement** : Lecture et écriture de cartes via fichier texte (`.txt`).
 
-Lecture et sauvegarde d’une carte depuis un fichier texte (.txt).
+### 3. Gestion du joueur
+- **Suivi de l'état** : Position, points de vie et inventaire du joueur.
+- **Conditions de fin** :
+  - **Victoire** : Atteinte de la sortie.
+  - **Défaite** : Aucun point de vie restant.
 
-3. Gestion du joueur
+### 4. Objets et pièges
+- **Objets aléatoires** : Clés, potions, trésors.
+- **Pièges** : Piques, trous.
+- **Interactions** :
+  - Gain/perte de points de vie.
+  - Ramassage d'objets.
+  - Ouverture de portes avec des clés.
 
-Suivi de la position, des points de vie et de l’inventaire.
+### 5. Interface console
+- **Menu principal** : Options pour **Jouer**, **Charger une partie** ou **Quitter**.
+- **Affichage en temps réel** : Score, nombre de déplacements, état du joueur.
+- **Sauvegarde/Chargement** : Possibilité de sauvegarder et charger une partie en cours.
 
-Détection de la victoire (atteinte de la sortie).
+### 6. Bonus (optionnels)
+- **Génération procédurale avancée** : Algorithme de backtracking pour des labyrinthes plus complexes.
+- **Ennemi mobile** : IA simple pour un ennemi qui se déplace dans le labyrinthe.
+- **Système de niveaux** : Labyrinthes de taille croissante.
+- **Améliorations graphiques** : Interface SDL plus élaborée.
+- **Adversaires supplémentaires** : Ajout d'ennemis.
+- **Téléporteurs et portes** : Mécaniques scriptables via des fichiers ou plugins.
 
-Détection de la défaite (piège déclenché).
+## Prérequis
 
-4. Objets et pièges
+- **SDL2** : Bibliothèque graphique pour l'affichage.
 
-Apparition aléatoire d’objets : clé, potion, trésor.
+## Installation
 
-Apparition de pièges : piques, trous.
-
-Interactions selon la case occupée : gain ou perte de points de vie, ramassage d’objets, ouverture de portes, etc.
-
-5. Interface console
-
-Menu principal : Jouer / Charger / Quitter.
-
-Affichage du score, du nombre de déplacements et de l’état du joueur.
-
-Option de sauvegarde et de chargement de la partie.
-
-6. Bonus (optionnels)
-
-Génération procédurale avancée du labyrinthe (algorithme de backtracking).
-
-Présence d’un ennemi mobile doté d’une intelligence artificielle simple.
-
-Système de niveaux progressifs (labyrinthes de taille croissante).
-
-Améliorations :
-- sous interface graphique avec SDL.
-- ajout d'adversaires.
-- ajout de téléporteurs, portes, clés (scriptable : fichiers ou plugins).
+```bash
+git clone https://github.com/votre-utilisateur/labyrinthe-sdl.git
+cd labyrinthe-sdl
+```
