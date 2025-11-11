@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include "src/map.h"
 
 #ifndef LAB_H
 # define LAB_H

@@ -1,8 +1,8 @@
 #ifndef LABY_H
-#define LABY_H
+# define LABY_H
 
-#define TAILLE 20
-#define CELL_SIZE 3
+# define TAILLE 20
+# define CELL_SIZE 3
 
 
 typedef struct s_enum {
@@ -11,6 +11,7 @@ typedef struct s_enum {
 
 void mapInit(t_Direction grille[TAILLE][TAILLE]);
 void generer(t_Direction grille[TAILLE][TAILLE]);
-void afficher(t_Direction grille[TAILLE][TAILLE]);
+void sauverLabyrinthe(t_Direction grille[TAILLE][TAILLE]);
+void creerLabyrinthe();
 
 #endif

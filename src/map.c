@@ -120,19 +120,28 @@ void sauverLabyrinthe(t_Direction grille[TAILLE][TAILLE])
         }
     }
 
-    FILE* f = fopen("../maps/labyrinthe.txt", "w");
-    for (int i = 0; i < h; i++) {
-        for (int j = 0; j < w; j++)
-            fputc(tab_final[i][j], f);
-        fputc('\n', f);
-    }
+    FILE* f = fopen("maps/labyrinthe.txt", "w");
+    if ( !f )
+    {
+        printf("impossible d'ouvrir le fichier domage...\n");
+    } else 
+    {
+        for (int i = 0; i < h; i++) 
+        {
+            for (int j = 0; j < w; j++)
+                fputc(tab_final[i][j], f);
+            fputc('\n', f);
+
+        }
     fclose(f);
+    }
+
 }
 
 
 /*Appel Global*/
 
-int creerLabyrinthe()
+void creerLabyrinthe()
 {
     t_Direction grille[TAILLE][TAILLE];
     mapInit(grille);
