@@ -4,8 +4,8 @@
 #include <time.h>
 
 
-/*Fonction qui initialide toutes les directions du double tableau vers la droites 
-sauf la colone de droite qui elle est initialise vers le bas 
+/*Fonction qui initialide toutes les directions du double tableau vers la droites
+sauf la colone de droite qui elle est initialise vers le bas
 init le noeud d'origine en bas a droite*/
 
 void mapInit(t_Direction grille[TAILLE][TAILLE])
@@ -27,14 +27,14 @@ void mapInit(t_Direction grille[TAILLE][TAILLE])
 }
 
 
-/*Fonction qui change le point d'origine et sews directions correspondantes 
+/*Fonction qui change le point d'origine et sews directions correspondantes
 afin de garder un labyrithe parfait
 labyrithe parfait = 1- tous les noeuds mene a l'origine
-                    2- pas plus d'une direction par noeuds 
-On arrete la boucle au bout de nb_iterations 
+                    2- pas plus d'une direction par noeuds
+On arrete la boucle au bout de nb_iterations
 ( juge suffisant pour avoir un labyrinthe 100% original)*/
 
-void generer(t_Direction grille[TAILLE][TAILLE]) 
+void generer(t_Direction grille[TAILLE][TAILLE])
 {
     srand(time(NULL));
 
@@ -43,7 +43,7 @@ void generer(t_Direction grille[TAILLE][TAILLE])
 
     int nb_iterations = TAILLE * TAILLE * 10;
 
-    for (int iter = 0; iter < nb_iterations; iter++) 
+    for (int iter = 0; iter < nb_iterations; iter++)
     {
         char voisins[4];
         int nb_voisins = 0;
@@ -58,7 +58,7 @@ void generer(t_Direction grille[TAILLE][TAILLE])
 
         grille[origine_i][origine_j].direction = voisin_choisi;
 
-        switch (voisin_choisi) 
+        switch (voisin_choisi)
         {
             case 'H': origine_i--; break;
             case 'B': origine_i++; break;
@@ -75,11 +75,11 @@ void generer(t_Direction grille[TAILLE][TAILLE])
 
     -Chaque noeuds represente une case de 3x3
     -On remplit ce tableau de cases de murs
-    -Chaque case a une direction 
-    -On enleve le mur centrale de chaque case 
+    -Chaque case a une direction
+    -On enleve le mur centrale de chaque case
     -On enelve les murs en fonction de la direction*/
 
-void sauverLabyrinthe(t_Direction grille[TAILLE][TAILLE]) 
+void sauverLabyrinthe(t_Direction grille[TAILLE][TAILLE])
 {
     int h = TAILLE * CELL_SIZE;
     int w = TAILLE * CELL_SIZE;
@@ -90,14 +90,14 @@ void sauverLabyrinthe(t_Direction grille[TAILLE][TAILLE])
             tab_final[i][j] = '#';
 
     for (int i = 0; i < TAILLE; i++) {
-        for (int j = 0; j < TAILLE; j++) 
+        for (int j = 0; j < TAILLE; j++)
         {
             int start_i = i * CELL_SIZE;
             int start_j = j * CELL_SIZE;
 
             tab_final[start_i + 1][start_j + 1] = ' ';
 
-            switch(grille[i][j].direction) 
+            switch(grille[i][j].direction)
             {
                 case 'H':
                     tab_final[start_i][start_j + 1] = ' ';
@@ -132,7 +132,7 @@ void sauverLabyrinthe(t_Direction grille[TAILLE][TAILLE])
 
 /*Appel Global*/
 
-int creerLabyrinthe() 
+int creerLabyrinthe()
 {
     t_Direction grille[TAILLE][TAILLE];
     mapInit(grille);

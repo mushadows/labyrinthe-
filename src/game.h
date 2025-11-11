@@ -2,7 +2,7 @@
 # define GAME_H
 
 # include <SDL2/SDL.h>
-# include "map.h"
+# include "utils.h"
 
 /* Dimensions de la fenetre */
 # define WINDOW_WIDTH 800
