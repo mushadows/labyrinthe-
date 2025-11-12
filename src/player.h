@@ -13,7 +13,7 @@ typedef struct s_player
 	t_position	position;
 }				t_player;
 
-t_player	*create_player();
+t_player	*create_player(void);
 // Ajoute des PV (retire avec un negatif)
 // Si max_pv est egale a -1 on considere qu'il n'y a pas de limite
 void		add_life(t_player *player, int pv, int max_pv);

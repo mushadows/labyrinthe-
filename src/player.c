@@ -1,14 +1,14 @@
 #include "../lab.h"
 
-t_player  *create_player()
+t_player	*create_player(void)
 {
-    t_player  *player;
+	t_player	*player;
 
-    player = (t_player *)malloc(sizeof(t_player));
+	player = (t_player *)malloc(sizeof(t_player));
 	player->life = 1;
 	player->position.x = 0;
 	player->position.y = 0;
-	return player;
+	return (player);
 }
 
 void	add_life(t_player *player, int pv, int max_pv)
