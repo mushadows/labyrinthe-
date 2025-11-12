@@ -1,11 +1,7 @@
+#include "position.h"
+
 #ifndef PLAYER_H
 # define PLAYER_H
-
-typedef struct s_position
-{
-	int	x;
-	int	y;
-}		t_position;
 
 typedef struct s_player
 {
@@ -15,7 +11,7 @@ typedef struct s_player
 
 t_player	*create_player();
 // Ajoute des PV (retire avec un negatif)
-// Si max_pv est egale a -1 on considere qu'il n'y a pas de limite
+// Si max_pv est egale a -1 on considere qu'il n'y a pas de limite (max)
 void		add_life(t_player *player, int pv, int max_pv);
 void		tp_player(t_player *player, t_position position);
 // no doc, check le nom de fonction
