@@ -297,11 +297,18 @@ int	map_get_player_y(const t_map *map)
 	return (map->player_y);
 }
 
-/* ------------------------------------------------------------------
- * Fonctions de generation et sauvegarde de labyrinthe
- * (deplacees depuis utils.c pour centraliser la logique dans map.c)
- */
+/*
+** ------------------------------------------------------------------
+** Fonctions de generation et sauvegarde de labyrinthe
+** (deplacees depuis utils.c pour centraliser la logique dans map.c)
+** ------------------------------------------------------------------
+*/
 
+/*
+** Initialise la grille de directions pour la generation de labyrinthe
+** Remplit la grille avec des directions par defaut
+** @param grille: tableau 2D de directions a initialiser
+*/
 void	map_init(t_Direction grille[TAILLE][TAILLE])
 {
 	int	i;
@@ -327,6 +334,11 @@ void	map_init(t_Direction grille[TAILLE][TAILLE])
 	grille[TAILLE - 1][TAILLE - 1].direction = 'N';
 }
 
+/*
+** Genere un labyrinthe aleatoire en utilisant une marche aleatoire
+** Parcourt la grille de maniere aleatoire pour creer des chemins
+** @param grille: tableau 2D de directions a remplir
+*/
 void	generer(t_Direction grille[TAILLE][TAILLE])
 {
 	int		origine_i;
@@ -370,6 +382,14 @@ void	generer(t_Direction grille[TAILLE][TAILLE])
 	}
 }
 
+/*
+** Traite une direction pour creer les passages dans le labyrinthe final
+** Modifie le tableau final en fonction de la direction specifiee
+** @param tab_final: tableau 2D representant le labyrinthe final
+** @param start_i: coordonnee I de depart
+** @param start_j: coordonnee J de depart
+** @param direction: direction a traiter (H/B/G/D)
+*/
 static void	process_direction(char tab_final[TAILLE * GEN_CELL_SIZE]\
 [TAILLE * GEN_CELL_SIZE], int start_i, int start_j, char direction)
 {
@@ -395,6 +415,11 @@ static void	process_direction(char tab_final[TAILLE * GEN_CELL_SIZE]\
 	}
 }
 
+/*
+** Sauvegarde le labyrinthe genere dans un fichier texte
+** Convertit la grille de directions en un labyrinthe ASCII et l'ecrit
+** @param grille: tableau 2D de directions representant le labyrinthe
+*/
 void	sauver_labyrinthe(t_Direction grille[TAILLE][TAILLE])
 {
 	int		h;
@@ -450,6 +475,10 @@ void	sauver_labyrinthe(t_Direction grille[TAILLE][TAILLE])
 	fclose(f);
 }
 
+/*
+** Cree un nouveau labyrinthe complet
+** Initialise, genere et sauvegarde un labyrinthe dans un fichier
+*/
 void	creer_labyrinthe(void)
 {
 	t_Direction		grille[TAILLE][TAILLE];
