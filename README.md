@@ -10,7 +10,7 @@ Ce projet est un jeu de labyrinthe où le joueur doit naviguer à travers un lab
 
 ### 1. Base du jeu
 - **Affichage du labyrinthe** : Rendu graphique du labyrinthe via SDL.
-- **Contrôles du joueur** : Déplacements avec les touches **ZQSD**/**wASD** ou les **flèches directionnelles**.
+- **Contrôles du joueur** : Déplacements avec les touches **ZQSD**/**WASD** ou les **flèches directionnelles**.
 - **Collisions** : Détection des collisions avec les murs et les limites de la carte.
 - **Gestion du joueur** : Suivi des **points de vie** et de la **position** du joueur.
 
@@ -52,6 +52,6 @@ Ce projet est un jeu de labyrinthe où le joueur doit naviguer à travers un lab
 ## Installation
 
 ```bash
-git clone https://github.com/votre-utilisateur/labyrinthe-sdl.git
-cd labyrinthe-sdl
+git clone https://github.com/mushadows/labyrinthe-.git
+cd labyrinthe-
 ```
