@@ -16,6 +16,9 @@ int	main(int argc, char *argv[])
 	(void)argc;
 	(void)argv;
 	printf("=== Labyrinthe SDL2 ===\n");
+	printf("Génération d'un nouveau labyrinthe...\n");
+	creerLabyrinthe();
+	printf("Labyrinthe généré dans maps/labyrinthe.txt\n");
 	printf("Chargement du jeu...\n");
 	game = game_create();
 	if (!game)
@@ -29,9 +32,9 @@ int	main(int argc, char *argv[])
 		game_destroy(game);
 		return (EXIT_FAILURE);
 	}
-	if (!game_load_map(game, "maps/example.txt"))
+	if (!game_load_map(game, "maps/labyrinthe.txt"))
 	{
-		printf("Erreur: Impossible de charger la carte 'maps/example.txt'\n");
+		printf("Erreur: Impossible de charger la carte 'maps/labyrinthe.txt'\n");
 		game_destroy(game);
 		return (EXIT_FAILURE);
 	}

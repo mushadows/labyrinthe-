@@ -2,7 +2,7 @@
 # define GAME_H
 
 # include <SDL2/SDL.h>
-# include "utils.h"
+# include "map.h"
 # include "player.h"
 
 /* Dimensions de la fenetre */
