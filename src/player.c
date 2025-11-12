@@ -26,12 +26,12 @@ void	tp_player(t_player *player, t_position position)
 
 void	player_move_up(t_player *player)
 {
-	player->position.y++;
+	player->position.y--;
 }
 
 void	player_move_down(t_player *player)
 {
-	player->position.y--;
+	player->position.y++;
 }
 
 void	player_move_right(t_player *player)

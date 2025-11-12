@@ -17,6 +17,7 @@ t_game	*game_create(void)
 	game->window = NULL;
 	game->renderer = NULL;
 	game->map = NULL;
+	game->player = NULL;
 	game->running = 0;
 	game->camera_x = 0;
 	game->camera_y = 0;
@@ -35,6 +36,8 @@ void	game_destroy(t_game *game)
 	game_cleanup(game);
 	if (game->map)
 		map_destroy(game->map);
+	if (game->player)
+		free(game->player);
 	free(game);
 }
 
@@ -215,15 +218,13 @@ static void	render_map_cells(t_game *game, int start_x, int start_y, int end_x,
 static void	render_player(t_game *game)
 {
 	SDL_Rect	cell_rect;
-	int			player_x;
-	int			player_y;
 
-	player_x = map_get_player_x(game->map);
-	player_y = map_get_player_y(game->map);
-	if (player_x >= 0 && player_y >= 0)
+	if (!game->player)
+		return ;
+	if (game->player->position.x >= 0 && game->player->position.y >= 0)
 	{
-		cell_rect.x = (player_x * CELL_SIZE) - game->camera_x;
-		cell_rect.y = (player_y * CELL_SIZE) - game->camera_y;
+		cell_rect.x = (game->player->position.x * CELL_SIZE) - game->camera_x;
+		cell_rect.y = (game->player->position.y * CELL_SIZE) - game->camera_y;
 		cell_rect.w = CELL_SIZE;
 		cell_rect.h = CELL_SIZE;
 		SDL_SetRenderDrawColor(game->renderer, COLOR_PLAYER_R, COLOR_PLAYER_G,
@@ -292,6 +293,8 @@ void	game_run(t_game *game)
 */
 int	game_load_map(t_game *game, const char *filename)
 {
+	t_position	start_pos;
+
 	if (!game)
 		return (0);
 	game->map = map_create();
@@ -303,6 +306,16 @@ int	game_load_map(t_game *game, const char *filename)
 		game->map = NULL;
 		return (0);
 	}
+	game->player = create_player();
+	if (!game->player)
+	{
+		map_destroy(game->map);
+		game->map = NULL;
+		return (0);
+	}
+	start_pos.x = map_get_player_x(game->map);
+	start_pos.y = map_get_player_y(game->map);
+	tp_player(game->player, start_pos);
 	game_update_camera(game);
 	return (1);
 }
@@ -310,6 +323,7 @@ int	game_load_map(t_game *game, const char *filename)
 /*
 ** Deplace le joueur selon le deplacement demande
 ** Verifie que la nouvelle position est valide avant le deplacement
+** Utilise les fonctions de player.c pour le deplacement
 ** @param game: pointeur vers la structure de jeu
 ** @param dx: deplacement en X
 ** @param dy: deplacement en Y
@@ -319,11 +333,30 @@ void	game_move_player(t_game *game, int dx, int dy)
 	int	new_x;
 	int	new_y;
 
-	if (!game || !game->map)
+	if (!game || !game->map || !game->player)
 		return ;
-	new_x = map_get_player_x(game->map) + dx;
-	new_y = map_get_player_y(game->map) + dy;
-	if (map_is_valid_position(game->map, new_x, new_y))
+	if (dx == 1)
+		player_move_right(game->player);
+	else if (dx == -1)
+		player_move_left(game->player);
+	else if (dy == 1)
+		player_move_down(game->player);
+	else if (dy == -1)
+		player_move_up(game->player);
+	new_x = game->player->position.x;
+	new_y = game->player->position.y;
+	if (!map_is_valid_position(game->map, new_x, new_y))
+	{
+		if (dx == 1)
+			player_move_left(game->player);
+		else if (dx == -1)
+			player_move_right(game->player);
+		else if (dy == 1)
+			player_move_up(game->player);
+		else if (dy == -1)
+			player_move_down(game->player);
+	}
+	else
 		map_set_player_position(game->map, new_x, new_y);
 }
 
@@ -337,10 +370,10 @@ void	game_update_camera(t_game *game)
 	int	max_camera_x;
 	int	max_camera_y;
 
-	if (!game || !game->map)
+	if (!game || !game->map || !game->player)
 		return ;
-	game->camera_x = (map_get_player_x(game->map) * CELL_SIZE) - (WINDOW_WIDTH / 2);
-	game->camera_y = (map_get_player_y(game->map) * CELL_SIZE) - (WINDOW_HEIGHT / 2);
+	game->camera_x = (game->player->position.x * CELL_SIZE) - (WINDOW_WIDTH / 2);
+	game->camera_y = (game->player->position.y * CELL_SIZE) - (WINDOW_HEIGHT / 2);
 	max_camera_x = (map_get_width(game->map) * CELL_SIZE) - WINDOW_WIDTH;
 	max_camera_y = (map_get_height(game->map) * CELL_SIZE) - WINDOW_HEIGHT;
 	if (game->camera_x < 0)
