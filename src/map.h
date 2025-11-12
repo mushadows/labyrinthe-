@@ -51,9 +51,9 @@ typedef struct s_direction
 /* Generateur de labyrinthe (produit un fichier texte dans maps/)
  * Ces fonctions permettent de generer et sauvegarder un labyrinthe.
  */
-void		mapInit(t_Direction grille[TAILLE][TAILLE]);
+void		map_init(t_Direction grille[TAILLE][TAILLE]);
 void		generer(t_Direction grille[TAILLE][TAILLE]);
-void		sauverLabyrinthe(t_Direction grille[TAILLE][TAILLE]);
-void		creerLabyrinthe(void);
+void		sauver_labyrinthe(t_Direction grille[TAILLE][TAILLE]);
+void		creer_labyrinthe(void);
 
 #endif

@@ -17,7 +17,7 @@ int	main(int argc, char *argv[])
 	(void)argv;
 	printf("=== Labyrinthe SDL2 ===\n");
 	printf("Génération d'un nouveau labyrinthe...\n");
-	creerLabyrinthe();
+	creer_labyrinthe();
 	printf("Labyrinthe généré dans maps/labyrinthe.txt\n");
 	printf("Chargement du jeu...\n");
 	game = game_create();

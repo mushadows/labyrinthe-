@@ -302,10 +302,10 @@ int	map_get_player_y(const t_map *map)
  * (deplacees depuis utils.c pour centraliser la logique dans map.c)
  */
 
-void	mapInit(t_Direction grille[TAILLE][TAILLE])
+void	map_init(t_Direction grille[TAILLE][TAILLE])
 {
-	int i;
-	int j;
+	int	i;
+	int	j;
 
 	i = 0;
 	while (i < TAILLE)
@@ -329,14 +329,14 @@ void	mapInit(t_Direction grille[TAILLE][TAILLE])
 
 void	generer(t_Direction grille[TAILLE][TAILLE])
 {
-	int origine_i;
-	int origine_j;
-	int nb_iterations;
-	char voisins[4];
-	int nb_voisins;
-	int index;
-	char voisin_choisi;
-	int iter;
+	int		origine_i;
+	int		origine_j;
+	int		nb_iterations;
+	char	voisins[4];
+	int		nb_voisins;
+	int		index;
+	int		iter;
+	char	voisin_choisi;
 
 	srand(time(NULL));
 	origine_i = TAILLE - 1;
@@ -370,7 +370,8 @@ void	generer(t_Direction grille[TAILLE][TAILLE])
 	}
 }
 
-static void	process_direction(char tab_final[TAILLE * GEN_CELL_SIZE][TAILLE * GEN_CELL_SIZE], int start_i, int start_j, char direction)
+static void	process_direction(char tab_final[TAILLE * GEN_CELL_SIZE]\
+[TAILLE * GEN_CELL_SIZE], int start_i, int start_j, char direction)
 {
 	if (direction == 'H')
 	{
@@ -394,14 +395,14 @@ static void	process_direction(char tab_final[TAILLE * GEN_CELL_SIZE][TAILLE * GE
 	}
 }
 
-void	sauverLabyrinthe(t_Direction grille[TAILLE][TAILLE])
+void	sauver_labyrinthe(t_Direction grille[TAILLE][TAILLE])
 {
-	int h;
-	int w;
-	char    tab_final[TAILLE * GEN_CELL_SIZE][TAILLE * GEN_CELL_SIZE];
-	FILE    *f;
-	int     i;
-	int     j;
+	int		h;
+	int		w;
+	char	tab_final[TAILLE * GEN_CELL_SIZE][TAILLE * GEN_CELL_SIZE];
+	FILE	*f;
+	int		i;
+	int		j;
 
 	h = TAILLE * GEN_CELL_SIZE;
 	w = TAILLE * GEN_CELL_SIZE;
@@ -422,10 +423,8 @@ void	sauverLabyrinthe(t_Direction grille[TAILLE][TAILLE])
 		j = 0;
 		while (j < TAILLE)
 		{
-			int start_i = i * GEN_CELL_SIZE;
-			int start_j = j * GEN_CELL_SIZE;
-			tab_final[start_i + 1][start_j + 1] = ' ';
-			process_direction(tab_final, start_i, start_j, grille[i][j].direction);
+			tab_final[(i * GEN_CELL_SIZE) + 1][(j * GEN_CELL_SIZE) + 1] = ' ';
+			process_direction(tab_final, i * GEN_CELL_SIZE, j * GEN_CELL_SIZE, grille[i][j].direction);
 			j++;
 		}
 		i++;
@@ -451,11 +450,11 @@ void	sauverLabyrinthe(t_Direction grille[TAILLE][TAILLE])
 	fclose(f);
 }
 
-void	creerLabyrinthe(void)
+void	creer_labyrinthe(void)
 {
-	t_Direction  grille[TAILLE][TAILLE];
+	t_Direction		grille[TAILLE][TAILLE];
 
-	mapInit(grille);
+	map_init(grille);
 	generer(grille);
-	sauverLabyrinthe(grille);
+	sauver_labyrinthe(grille);
 }
