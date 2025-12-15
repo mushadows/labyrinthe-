@@ -8,7 +8,8 @@ typedef enum s_cellType
 {
 	CELL_EMPTY = ' ',
 	CELL_WALL = '#',
-	CELL_PLAYER = '@'
+	CELL_PLAYER = '@',
+	CELL_EXIT = 'E'
 }			t_cellType;
 
 /*
@@ -41,7 +42,7 @@ int			map_get_player_y(const t_map *map);
 
 /* Generation / sauvegarde de labyrinthe (outil) */
 # define TAILLE 20
-# define GEN_CELL_SIZE 3
+# define GEN_CELL_SIZE 4
 
 typedef struct s_direction
 {

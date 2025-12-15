@@ -2,7 +2,7 @@ NAME		= labyrinthe
 CC			= gcc
 
 WFLAGS		= -Wall -Werror -Wextra
-SDLFLAGS	= -lSDL2
+SDLFLAGS	= -lSDL2 -lSDL2_image
 FLAGS		= -std=c99 -lm
 DEBUGFLAG	= -g
 
@@ -13,7 +13,7 @@ OBJ_NO_MAIN	= $(filter-out $(SRCDIR)/main.o, $(OBJ))
 RM			= rm -f
 
 $(NAME):	$(OBJ)
-	$(CC) $(WFLAGS) $(SDLFLAGS) $(FLAGS) $^ -o $(NAME)
+	$(CC) $(WFLAGS) $(FLAGS) $^ $(SDLFLAGS) -o $(NAME)
 
 
 all:		$(NAME)

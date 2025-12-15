@@ -396,22 +396,34 @@ static void	process_direction(char tab_final[TAILLE * GEN_CELL_SIZE]\
 	if (direction == 'H')
 	{
 		tab_final[start_i][start_j + 1] = ' ';
+		tab_final[start_i][start_j + 2] = ' ';
 		tab_final[start_i - 1][start_j + 1] = ' ';
+		tab_final[start_i - 1][start_j + 2] = ' ';
+		tab_final[start_i - 2][start_j + 1] = ' ';
+		tab_final[start_i - 2][start_j + 2] = ' ';
 	}
 	else if (direction == 'B')
 	{
-		tab_final[start_i + 2][start_j + 1] = ' ';
 		tab_final[start_i + 3][start_j + 1] = ' ';
+		tab_final[start_i + 3][start_j + 2] = ' ';
+		tab_final[start_i + 4][start_j + 1] = ' ';
+		tab_final[start_i + 4][start_j + 2] = ' ';
 	}
 	else if (direction == 'G')
 	{
 		tab_final[start_i + 1][start_j] = ' ';
+		tab_final[start_i + 2][start_j] = ' ';
 		tab_final[start_i + 1][start_j - 1] = ' ';
+		tab_final[start_i + 2][start_j - 1] = ' ';
+		tab_final[start_i + 1][start_j - 2] = ' ';
+		tab_final[start_i + 2][start_j - 2] = ' ';
 	}
 	else if (direction == 'D')
 	{
-		tab_final[start_i + 1][start_j + 2] = ' ';
 		tab_final[start_i + 1][start_j + 3] = ' ';
+		tab_final[start_i + 2][start_j + 3] = ' ';
+		tab_final[start_i + 1][start_j + 4] = ' ';
+		tab_final[start_i + 2][start_j + 4] = ' ';
 	}
 }
 
@@ -449,11 +461,15 @@ void	sauver_labyrinthe(t_Direction grille[TAILLE][TAILLE])
 		while (j < TAILLE)
 		{
 			tab_final[(i * GEN_CELL_SIZE) + 1][(j * GEN_CELL_SIZE) + 1] = ' ';
+			tab_final[(i * GEN_CELL_SIZE) + 1][(j * GEN_CELL_SIZE) + 2] = ' ';
+			tab_final[(i * GEN_CELL_SIZE) + 2][(j * GEN_CELL_SIZE) + 1] = ' ';
+			tab_final[(i * GEN_CELL_SIZE) + 2][(j * GEN_CELL_SIZE) + 2] = ' ';
 			process_direction(tab_final, i * GEN_CELL_SIZE, j * GEN_CELL_SIZE, grille[i][j].direction);
 			j++;
 		}
 		i++;
 	}
+	tab_final[h - 2][w - 2] = 'E';
 	f = fopen("maps/labyrinthe.txt", "w");
 	if (!f)
 	{

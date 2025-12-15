@@ -18,6 +18,7 @@ t_game	*game_create(void)
 	game->renderer = NULL;
 	game->map = NULL;
 	game->player = NULL;
+	game->textures = NULL;
 	game->running = 0;
 	game->camera_x = 0;
 	game->camera_y = 0;
@@ -34,6 +35,8 @@ void	game_destroy(t_game *game)
 	if (!game)
 		return ;
 	game_cleanup(game);
+	if (game->textures)
+		free_textures(game->textures);
 	if (game->map)
 		map_destroy(game->map);
 	if (game->player)
@@ -69,6 +72,15 @@ int	game_init(t_game *game)
 	if (!game->renderer)
 	{
 		printf("Erreur création renderer: %s\n", SDL_GetError());
+		SDL_DestroyWindow(game->window);
+		SDL_Quit();
+		return (0);
+	}
+	game->textures = load_textures(game->renderer);
+	if (!game->textures)
+	{
+		printf("Erreur chargement des textures\n");
+		SDL_DestroyRenderer(game->renderer);
 		SDL_DestroyWindow(game->window);
 		SDL_Quit();
 		return (0);
@@ -160,20 +172,55 @@ void	game_update(t_game *game)
 ** @param game: pointeur vers la structure de jeu
 ** @param cell_rect: rectangle de la cellule a afficher
 ** @param cell: type de cellule a afficher
+** @param x: coordonnee X de la cellule
+** @param y: coordonnee Y de la cellule
 */
-static void	render_cell(t_game *game, SDL_Rect *cell_rect, t_cellType cell)
+static void	render_cell(t_game *game, SDL_Rect *cell_rect, t_cellType cell, int x, int y)
 {
+	SDL_Texture	*wall_texture;
+
 	if (cell == CELL_WALL)
 	{
-		SDL_SetRenderDrawColor(game->renderer, COLOR_WALL_R, COLOR_WALL_G,
-			COLOR_WALL_B, COLOR_WALL_A);
-		SDL_RenderFillRect(game->renderer, cell_rect);
+		if (game->textures)
+		{
+			wall_texture = get_wall_texture(game->textures, game->map, x, y);
+			if (wall_texture)
+				SDL_RenderCopy(game->renderer, wall_texture, NULL, cell_rect);
+		}
+		else
+		{
+			SDL_SetRenderDrawColor(game->renderer, COLOR_WALL_R, COLOR_WALL_G,
+				COLOR_WALL_B, COLOR_WALL_A);
+			SDL_RenderFillRect(game->renderer, cell_rect);
+		}
 	}
 	else if (cell == CELL_EMPTY)
 	{
-		SDL_SetRenderDrawColor(game->renderer, COLOR_EMPTY_R, COLOR_EMPTY_G,
-			COLOR_EMPTY_B, COLOR_EMPTY_A);
-		SDL_RenderFillRect(game->renderer, cell_rect);
+		if (game->textures && game->textures->floor)
+		{
+			SDL_Texture	*edge_texture;
+
+			SDL_RenderCopy(game->renderer, game->textures->floor, NULL, cell_rect);
+			edge_texture = get_floor_top_edge(game->textures, game->map, x, y);
+			if (edge_texture)
+				SDL_RenderCopy(game->renderer, edge_texture, NULL, cell_rect);
+		}
+		else
+		{
+			SDL_SetRenderDrawColor(game->renderer, COLOR_EMPTY_R, COLOR_EMPTY_G,
+				COLOR_EMPTY_B, COLOR_EMPTY_A);
+			SDL_RenderFillRect(game->renderer, cell_rect);
+		}
+	}
+	else if (cell == CELL_EXIT)
+	{
+		if (game->textures && game->textures->exit)
+			SDL_RenderCopy(game->renderer, game->textures->exit, NULL, cell_rect);
+		else
+		{
+			SDL_SetRenderDrawColor(game->renderer, 0, 255, 0, 255);
+			SDL_RenderFillRect(game->renderer, cell_rect);
+		}
 	}
 }
 
@@ -204,7 +251,7 @@ static void	render_map_cells(t_game *game, int start_x, int start_y, int end_x,
 			cell_rect.x = (x * CELL_SIZE) - game->camera_x;
 			cell_rect.y = (y * CELL_SIZE) - game->camera_y;
 			cell = map_get_cell(game->map, x, y);
-			render_cell(game, &cell_rect, cell);
+			render_cell(game, &cell_rect, cell, x, y);
 			x++;
 		}
 		y++;
@@ -227,9 +274,14 @@ static void	render_player(t_game *game)
 		cell_rect.y = (game->player->position.y * CELL_SIZE) - game->camera_y;
 		cell_rect.w = CELL_SIZE;
 		cell_rect.h = CELL_SIZE;
-		SDL_SetRenderDrawColor(game->renderer, COLOR_PLAYER_R, COLOR_PLAYER_G,
-			COLOR_PLAYER_B, COLOR_PLAYER_A);
-		SDL_RenderFillRect(game->renderer, &cell_rect);
+		if (game->textures && game->textures->player)
+			SDL_RenderCopy(game->renderer, game->textures->player, NULL, &cell_rect);
+		else
+		{
+			SDL_SetRenderDrawColor(game->renderer, COLOR_PLAYER_R, COLOR_PLAYER_G,
+				COLOR_PLAYER_B, COLOR_PLAYER_A);
+			SDL_RenderFillRect(game->renderer, &cell_rect);
+		}
 	}
 }
 

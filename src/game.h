@@ -4,6 +4,7 @@
 # include <SDL2/SDL.h>
 # include "map.h"
 # include "player.h"
+# include "utils.h"
 
 /* Dimensions de la fenetre */
 # define WINDOW_WIDTH 800
@@ -44,6 +45,7 @@ typedef struct s_game
 	SDL_Renderer	*renderer;
 	t_map			*map;
 	t_player		*player;
+	t_textures		*textures;
 	int				running;
 	int				camera_x;
 	int				camera_y;
