@@ -29,6 +29,7 @@ typedef struct s_map
 t_map		*map_create(void);
 void		map_destroy(t_map *map);
 int			map_load_from_file(t_map *map, const char *filename);
+int			map_save_to_file(const t_map *map, const char *filename);
 t_cellType	map_get_cell(const t_map *map, int x, int y);
 void		map_set_cell(t_map *map, int x, int y, t_cellType cell);
 void		map_set_player_position(t_map *map, int x, int y);

@@ -193,6 +193,36 @@ int	map_load_from_file(t_map *map, const char *filename)
 }
 
 /*
+** Sauvegarde une carte dans un fichier texte
+** Ecrit la grille complete ligne par ligne
+** @param map: pointeur vers la structure de carte
+** @param filename: nom du fichier de destination
+** @return 1 en cas de succes, 0 en cas d'erreur
+*/
+int	map_save_to_file(const t_map *map, const char *filename)
+{
+	FILE	*file;
+	int		y;
+
+	if (!map || !map->grid)
+		return (0);
+	file = fopen(filename, "w");
+	if (!file)
+	{
+		printf("Erreur: impossible de créer le fichier %s\n", filename);
+		return (0);
+	}
+	y = 0;
+	while (y < map->height)
+	{
+		fprintf(file, "%s\n", map->grid[y]);
+		y++;
+	}
+	fclose(file);
+	return (1);
+}
+
+/*
 ** Recupere le type de cellule a une position donnee
 ** @param map: pointeur vers la structure de carte
 ** @param x: coordonnee X

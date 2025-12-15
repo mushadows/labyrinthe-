@@ -49,6 +49,7 @@ typedef struct s_game
 	int				running;
 	int				camera_x;
 	int				camera_y;
+	int				use_wasd;
 }	t_game;
 
 /* Fonctions de gestion du jeu */
@@ -65,5 +66,12 @@ int		game_load_map(t_game *game, const char *filename);
 
 void	game_move_player(t_game *game, int dx, int dy);
 void	game_update_camera(t_game *game);
+
+/* Fonctions de sauvegarde/chargement */
+int		game_save(t_game *game, const char *filename);
+int		game_load(t_game *game, const char *filename);
+
+/* Menu pause en jeu */
+void	game_pause_menu(t_game *game);
 
 #endif
