@@ -21,6 +21,6 @@ typedef struct s_obj
 t_obj	*create_obj(char name, int effect, t_position position);
 // Ajoute des PV (retire avec un negatif)
 // Si max_pv est egale a -1 on considere qu'il n'y a pas de limite (max)
-void    use_obj(t_player *player, t_obj obj, int max_pv);
+void    use_obj(t_player *player, t_obj obj);
 
 #endif

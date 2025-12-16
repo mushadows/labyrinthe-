@@ -12,7 +12,7 @@ t_obj   *create_obj(char name, int effect, t_position position)
 	return obj;
 }
 
-void    use_obj(t_player *player, t_obj obj, int max_pv)
+void    use_obj(t_player *player, t_obj obj)
 {
-	add_life(player, obj.effect, max_pv);
+	add_life(player, obj.effect);
 }
