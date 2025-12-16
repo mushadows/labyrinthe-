@@ -13,6 +13,7 @@ t_player	*create_player(void)
 	player = (t_player *)malloc(sizeof(t_player));
 	assert(player != NULL);
 	player->life = 1;
+	player->max_life = 0;
 	player->position.x = 0;
 	player->position.y = 0;
 	return (player);
@@ -22,13 +23,15 @@ t_player	*create_player(void)
 ** Ajoute ou retire des points de vie au joueur
 ** @param player: pointeur vers la structure du joueur
 ** @param pv: nombre de points de vie a ajouter (negatif pour retirer)
-** @param max_pv: limite maximale de points de vie (-1 pour pas de limite)
+** @param max_pv: limite maximale de points de vie (NULL pour pas de limite)
 */
-void	add_life(t_player *player, int pv, int max_pv)
+void	add_life(t_player *player, int pv)
 {
 	player->life += pv;
-	if (max_pv != -1 && player->life > max_pv)
-		player->life = max_pv;
+	if (player->max_life && player->life > player->max_life)
+		player->life = player->max_life;
+	else if (player->life > MAX_PV)
+		player->life = MAX_PV;
 }
 
 /*

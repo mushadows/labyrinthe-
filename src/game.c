@@ -316,6 +316,38 @@ static void	render_player(t_game *game)
 }
 
 /*
+** Affiche la barre de vie du joueur
+** @param game: pointeur vers la structure de jeu
+*/
+static void	render_pv_player(t_game *game)
+{
+	SDL_Rect	bg_rect;
+	SDL_Rect	border_rect;
+	SDL_Rect	life_rect;
+
+	bg_rect.x = WINDOW_WIDTH - 240 - 16;
+	bg_rect.y = 16;
+	bg_rect.w = 240;
+	bg_rect.h = 32;
+	border_rect = bg_rect;
+	border_rect.x -= 2;
+	border_rect.y -= 2;
+	border_rect.w += 5;
+	border_rect.h += 5;
+	life_rect = bg_rect;
+	if (game->player->max_life)
+		life_rect.w = life_rect.w * game->player->life / game->player->max_life;
+	else
+		life_rect.w = life_rect.w * game->player->life / MAX_PV;
+	SDL_SetRenderDrawColor(game->renderer, 100, 100, 100, 255);
+	SDL_RenderFillRect(game->renderer, &border_rect);
+	SDL_SetRenderDrawColor(game->renderer, 0, 0, 0, 180);
+	SDL_RenderFillRect(game->renderer, &bg_rect);
+	SDL_SetRenderDrawColor(game->renderer, 255, 60, 26, 255);
+	SDL_RenderFillRect(game->renderer, &life_rect);
+}
+
+/*
 ** Affiche l'ensemble du jeu (carte et joueur)
 ** Calcule la zone visible et optimise l'affichage
 ** @param game: pointeur vers la structure de jeu
@@ -346,6 +378,7 @@ void	game_render(t_game *game)
 		end_y = map_get_height(game->map);
 	render_map_cells(game, start_x, start_y, end_x, end_y);
 	render_player(game);
+	render_pv_player(game);
 	SDL_RenderPresent(game->renderer);
 }
 
