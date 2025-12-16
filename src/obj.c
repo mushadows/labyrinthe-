@@ -1,4 +1,4 @@
-#include "../lab.h"
+#include "obj.h"
 
 t_obj   *create_obj(char name, int effect, t_position position)
 {
@@ -12,7 +12,3 @@ t_obj   *create_obj(char name, int effect, t_position position)
 	return obj;
 }
 
-void    use_obj(t_player *player, t_obj obj)
-{
-	add_life(player, obj.effect);
-}

@@ -1,7 +1,14 @@
-#include "position.h"
 
 #ifndef OBJ_H
 # define OBJ_H
+
+# define POTION 20
+# define CHEST 5
+# define MONSTER -10
+
+# include "position.h"
+# include "player.h"
+# include <stdlib.h>
 
 /*
 les objects sont definis par des noms (potion P, trap T, ...) a definir

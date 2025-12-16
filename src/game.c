@@ -485,6 +485,25 @@ int	game_load_map(t_game *game, const char *filename)
 	return (1);
 }
 
+void	game_apply_object(t_game *game, t_cellType cell)
+{
+	if (cell == CELL_POTION)
+	{
+		add_life(game->player, POTION);
+		game->map->grid[game->player->position.y][game->player->position.x] = CELL_EMPTY;
+	}
+	if (cell == CELL_TRESOR_CLOSED)
+	{
+		add_life(game->player, CHEST);
+		game->map->grid[game->player->position.y][game->player->position.x] = CELL_TRESOR_EMPTY;
+	}
+	if (cell == CELL_MONSTER)
+	{
+		add_life(game->player, MONSTER);
+		// game->map->grid[game->player->position.y][game->player->position.x] = CELL_EMPTY;
+	}
+}
+
 /*
 ** Deplace le joueur selon le deplacement demande
 ** Verifie que la nouvelle position est valide avant le deplacement
@@ -532,6 +551,12 @@ void	game_move_player(t_game *game, int dx, int dy)
 			SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, "Victoire !",
 				"Félicitations ! Vous avez atteint la sortie !", game->window);
 			game->running = 0;
+		}
+		if (cell == CELL_POTION || cell == CELL_TRESOR_CLOSED || cell == CELL_MONSTER)
+		{
+			map_set_player_position(game->map, new_x, new_y);
+			game_apply_object(game, cell);
+			game_render(game);
 		}
 		else
 			map_set_player_position(game->map, new_x, new_y);

@@ -5,6 +5,7 @@
 # include "map.h"
 # include "player.h"
 # include "utils.h"
+# include "obj.h"
 
 /* Dimensions de la fenetre */
 # define WINDOW_WIDTH 800
