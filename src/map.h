@@ -9,7 +9,11 @@ typedef enum s_cellType
 	CELL_EMPTY = ' ',
 	CELL_WALL = '#',
 	CELL_PLAYER = '@',
-	CELL_EXIT = 'E'
+	CELL_EXIT = 'E',
+	CELL_POTION = 'P',
+	CELL_TRESOR_CLOSED = 'C',
+	CELL_TRESOR_EMPTY = 'T',
+	CELL_MONSTER = 'M'
 }			t_cellType;
 
 /*

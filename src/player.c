@@ -12,7 +12,7 @@ t_player	*create_player(void)
 
 	player = (t_player *)malloc(sizeof(t_player));
 	assert(player != NULL);
-	player->life = 1;
+	player->life = MAX_PV;
 	player->max_life = 0;
 	player->position.x = 0;
 	player->position.y = 0;
