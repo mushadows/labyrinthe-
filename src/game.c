@@ -47,6 +47,7 @@ t_game	*game_create(void)
 	game->camera_x = 0;
 	game->camera_y = 0;
 	game->use_wasd = 1;
+	game->movements = 0;
 	load_game_settings(game);
 	return (game);
 }
@@ -369,6 +370,25 @@ static void	render_player(t_game *game)
 ** Affiche la barre de vie du joueur
 ** @param game: pointeur vers la structure de jeu
 */
+static void	draw_number(SDL_Renderer *renderer, char c, int x, int y, int s);
+static void	render_score_player(t_game *game)
+{
+	int		i;
+	int		len;
+	char	*nb;
+
+	i = -1;
+	nb = itoa(game->movements);
+	len = strlen(nb);
+	while (++i < len)
+		draw_number(game->renderer, nb[i], WINDOW_WIDTH - 240 - 16 - 6 - 16 - 24 * (len - i), 16, 6);
+	free(nb);
+}
+
+/*
+** Affiche la barre de vie du joueur
+** @param game: pointeur vers la structure de jeu
+*/
 static void	render_pv_player(t_game *game)
 {
 	SDL_Rect	bg_rect;
@@ -428,6 +448,7 @@ void	game_render(t_game *game)
 		end_y = map_get_height(game->map);
 	render_map_cells(game, start_x, start_y, end_x, end_y);
 	render_player(game);
+	render_score_player(game);
 	render_pv_player(game);
 	SDL_RenderPresent(game->renderer);
 }
@@ -543,6 +564,7 @@ void	game_move_player(t_game *game, int dx, int dy)
 	}
 	else
 	{
+		game->movements++;
 		cell = map_get_cell(game->map, new_x, new_y);
 		if (cell == CELL_EXIT)
 		{
@@ -552,7 +574,7 @@ void	game_move_player(t_game *game, int dx, int dy)
 				"Félicitations ! Vous avez atteint la sortie !", game->window);
 			game->running = 0;
 		}
-		if (cell == CELL_POTION || cell == CELL_TRESOR_CLOSED || cell == CELL_MONSTER)
+		else if (cell == CELL_POTION || cell == CELL_TRESOR_CLOSED || cell == CELL_MONSTER)
 		{
 			map_set_player_position(game->map, new_x, new_y);
 			game_apply_object(game, cell);
@@ -610,6 +632,7 @@ int	game_save(t_game *game, const char *filename)
 	}
 	fprintf(file, "PLAYER_POS %d %d\n", game->player->position.x, game->player->position.y);
 	fprintf(file, "PLAYER_LIFE %d\n", game->player->life);
+	fprintf(file, "PLAYER_SCORE %d\n", game->movements);
 	fprintf(file, "USE_WASD %d\n", game->use_wasd);
 	snprintf(map_filename, sizeof(map_filename), "maps/saved_map.txt");
 	fprintf(file, "MAP_FILE %s\n", map_filename);
@@ -634,6 +657,7 @@ int	game_load(t_game *game, const char *filename)
 	FILE		*file;
 	char		buffer[256];
 	t_position	pos;
+	int			score;
 	int			life;
 	int			use_wasd;
 	char		map_filename[256];
@@ -653,6 +677,11 @@ int	game_load(t_game *game, const char *filename)
 		{
 			if (game->player)
 				tp_player(game->player, pos);
+		}
+		if (sscanf(buffer, "PLAYER_SCORE %d", &score) == 1)
+		{
+			if (score)
+				game->movements = score;
 		}
 		else if (sscanf(buffer, "PLAYER_LIFE %d", &life) == 1)
 		{
@@ -919,6 +948,143 @@ static void	draw_pause_char(SDL_Renderer *renderer, char c, int x, int y, int s)
 		draw_text_pixel(renderer, x + 4*s, y + s, s);
 		draw_text_pixel(renderer, x + 4*s, y + 2*s, s);
 		draw_text_pixel(renderer, x + 4*s, y + 3*s, s);
+	}
+}
+
+static void	draw_number(SDL_Renderer *renderer, char c, int x, int y, int s)
+{
+	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+	if (c == '0')
+	{
+		draw_text_pixel(renderer, x, y, s);
+		draw_text_pixel(renderer, x + s, y, s);
+		draw_text_pixel(renderer, x + 2*s, y, s);
+		draw_text_pixel(renderer, x, y + s, s);
+		draw_text_pixel(renderer, x + 2*s, y + s, s);
+		draw_text_pixel(renderer, x, y + 2*s, s);
+		draw_text_pixel(renderer, x + 2*s, y + 2*s, s);
+		draw_text_pixel(renderer, x, y + 3*s, s);
+		draw_text_pixel(renderer, x + 2*s, y + 3*s, s);
+		draw_text_pixel(renderer, x, y + 4*s, s);
+		draw_text_pixel(renderer, x + s, y + 4*s, s);
+		draw_text_pixel(renderer, x + 2*s, y + 4*s, s);
+	}
+	else if (c == '1')
+	{
+		draw_text_pixel(renderer, x + s, y, s);
+		draw_text_pixel(renderer, x, y + s, s);
+		draw_text_pixel(renderer, x + s, y + s, s);
+		draw_text_pixel(renderer, x + s, y + 2*s, s);
+		draw_text_pixel(renderer, x + s, y + 3*s, s);
+		draw_text_pixel(renderer, x + s, y + 4*s, s);
+	}
+	else if (c == '2')
+	{
+		draw_text_pixel(renderer, x, y, s);
+		draw_text_pixel(renderer, x + s, y, s);
+		draw_text_pixel(renderer, x + 2*s, y, s);
+		draw_text_pixel(renderer, x + 2*s, y + s, s);
+		draw_text_pixel(renderer, x + s, y + 2*s, s);
+		draw_text_pixel(renderer, x, y + 3*s, s);
+		draw_text_pixel(renderer, x, y + 4*s, s);
+		draw_text_pixel(renderer, x + s, y + 4*s, s);
+		draw_text_pixel(renderer, x + 2*s, y + 4*s, s);
+	}
+	else if (c == '3')
+	{
+		draw_text_pixel(renderer, x, y, s);
+		draw_text_pixel(renderer, x + s, y, s);
+		// draw_text_pixel(renderer, x + 2*s, y, s);
+		draw_text_pixel(renderer, x + 2*s, y + s, s);
+		draw_text_pixel(renderer, x, y + 2*s, s);
+		draw_text_pixel(renderer, x + s, y + 2*s, s);
+		draw_text_pixel(renderer, x + 2*s, y + 2*s, s);
+		draw_text_pixel(renderer, x + 2*s, y + 3*s, s);
+		draw_text_pixel(renderer, x, y + 4*s, s);
+		draw_text_pixel(renderer, x + s, y + 4*s, s);
+		// draw_text_pixel(renderer, x + 2*s, y + 4*s, s);
+	}
+	else if (c == '4')
+	{
+		draw_text_pixel(renderer, x, y, s);
+		draw_text_pixel(renderer, x + 2*s, y, s);
+		draw_text_pixel(renderer, x, y + s, s);
+		draw_text_pixel(renderer, x + 2*s, y + s, s);
+		draw_text_pixel(renderer, x, y + 2*s, s);
+		draw_text_pixel(renderer, x + 2*s, y + 2*s, s);
+		draw_text_pixel(renderer, x + s, y + 2*s, s);
+		draw_text_pixel(renderer, x + 2*s, y + 3*s, s);
+		draw_text_pixel(renderer, x + 2*s, y + 4*s, s);
+	}
+	else if (c == '5')
+	{
+		draw_text_pixel(renderer, x, y, s);
+		draw_text_pixel(renderer, x + s, y, s);
+		draw_text_pixel(renderer, x + 2*s, y, s);
+		draw_text_pixel(renderer, x, y + s, s);
+		draw_text_pixel(renderer, x, y + 2*s, s);
+		draw_text_pixel(renderer, x + s, y + 2*s, s);
+		draw_text_pixel(renderer, x + 2*s, y + 2*s, s);
+		draw_text_pixel(renderer, x + 2*s, y + 3*s, s);
+		draw_text_pixel(renderer, x, y + 4*s, s);
+		draw_text_pixel(renderer, x + s, y + 4*s, s);
+		draw_text_pixel(renderer, x + 2*s, y + 4*s, s);
+	}
+	else if (c == '6')
+	{
+		draw_text_pixel(renderer, x, y, s);
+		draw_text_pixel(renderer, x + s, y, s);
+		draw_text_pixel(renderer, x + 2*s, y, s);
+		draw_text_pixel(renderer, x, y + s, s);
+		draw_text_pixel(renderer, x, y + 2*s, s);
+		draw_text_pixel(renderer, x + s, y + 2*s, s);
+		draw_text_pixel(renderer, x + 2*s, y + 2*s, s);
+		draw_text_pixel(renderer, x, y + 3*s, s);
+		draw_text_pixel(renderer, x + 2*s, y + 3*s, s);
+		draw_text_pixel(renderer, x, y + 4*s, s);
+		draw_text_pixel(renderer, x + s, y + 4*s, s);
+		draw_text_pixel(renderer, x + 2*s, y + 4*s, s);
+	}
+	else if (c == '7')
+	{
+		draw_text_pixel(renderer, x, y, s);
+		draw_text_pixel(renderer, x + s, y, s);
+		draw_text_pixel(renderer, x + 2*s, y, s);
+		draw_text_pixel(renderer, x + 2*s, y + s, s);
+		draw_text_pixel(renderer, x + 2*s, y + 2*s, s);
+		draw_text_pixel(renderer, x + s, y + 3*s, s);
+		draw_text_pixel(renderer, x + s, y + 4*s, s);
+	}
+	else if (c == '8')
+	{
+		draw_text_pixel(renderer, x, y, s);
+		draw_text_pixel(renderer, x + s, y, s);
+		draw_text_pixel(renderer, x + 2*s, y, s);
+		draw_text_pixel(renderer, x, y + s, s);
+		draw_text_pixel(renderer, x + 2*s, y + s, s);
+		draw_text_pixel(renderer, x, y + 2*s, s);
+		draw_text_pixel(renderer, x + s, y + 2*s, s);
+		draw_text_pixel(renderer, x + 2*s, y + 2*s, s);
+		draw_text_pixel(renderer, x, y + 3*s, s);
+		draw_text_pixel(renderer, x + 2*s, y + 3*s, s);
+		draw_text_pixel(renderer, x, y + 4*s, s);
+		draw_text_pixel(renderer, x + s, y + 4*s, s);
+		draw_text_pixel(renderer, x + 2*s, y + 4*s, s);
+	}
+	else if (c == '9')
+	{
+		draw_text_pixel(renderer, x, y, s);
+		draw_text_pixel(renderer, x + s, y, s);
+		draw_text_pixel(renderer, x + 2*s, y, s);
+		draw_text_pixel(renderer, x, y + s, s);
+		draw_text_pixel(renderer, x + 2*s, y + s, s);
+		draw_text_pixel(renderer, x, y + 2*s, s);
+		draw_text_pixel(renderer, x + s, y + 2*s, s);
+		draw_text_pixel(renderer, x + 2*s, y + 2*s, s);
+		draw_text_pixel(renderer, x + 2*s, y + 3*s, s);
+		draw_text_pixel(renderer, x, y + 4*s, s);
+		draw_text_pixel(renderer, x + s, y + 4*s, s);
+		draw_text_pixel(renderer, x + 2*s, y + 4*s, s);
 	}
 }
 

@@ -51,6 +51,7 @@ typedef struct s_game
 	int				camera_x;
 	int				camera_y;
 	int				use_wasd;
+	int				movements;
 }	t_game;
 
 /* Fonctions de gestion du jeu */

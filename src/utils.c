@@ -169,3 +169,36 @@ SDL_Texture	*get_floor_top_edge(t_textures *textures, const void *map_ptr, int x
 		return (textures->wall_corner_nw);
 	return (textures->wall_top);
 }
+
+char	*itoa(int nb)
+{
+	int		i;
+	char	*cnb;
+	int		current;
+
+	i = 0;
+	if (nb < 0)
+		i++;
+	current = nb;
+	while (current)
+	{
+		i++;
+		current /= 10;
+	}
+	cnb = (char *)calloc(i+1, sizeof(char));
+	if (!cnb)
+		return NULL;
+	if (nb < 0)
+		cnb[0] = '-';
+	while (nb)
+	{
+		i--;
+		current = 0;
+		while (current < 9 && current != nb % 10)
+			current++;
+		cnb[i] = current + '0';
+		nb /= 10;
+	}
+	return cnb;
+}
+
