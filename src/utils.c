@@ -62,6 +62,14 @@ t_textures	*load_textures(SDL_Renderer *renderer)
 			"0x72_16x16DungeonTileset.v5/items/Floor_ladder.png");
 	textures->player = load_texture(renderer,
 			"0x72_16x16DungeonTileset.v5/items/hero_basic.png");
+	textures->potion = load_texture(renderer,
+			"0x72_16x16DungeonTileset.v5/items/flask_big_red.png");
+	textures->tresor_closed = load_texture(renderer,
+			"0x72_16x16DungeonTileset.v5/items/chest_golden_closed.png");
+	textures->tresor_empty = load_texture(renderer,
+			"0x72_16x16DungeonTileset.v5/items/chest_golden_open_empty.png");
+	textures->monster = load_texture(renderer,
+			"0x72_16x16DungeonTileset.v5/items/monster_orc.png");
 	if (!textures->wall_left || !textures->wall_right || !textures->wall_top
 		|| !textures->wall_corner_ne || !textures->wall_corner_nw
 		|| !textures->wall_center || !textures->floor || !textures->exit
