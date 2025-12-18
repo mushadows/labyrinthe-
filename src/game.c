@@ -200,6 +200,13 @@ void	draw_obj(t_game *game, SDL_Rect *cell_rect, t_cellType cell, int x, int y)
 		if (edge_texture)
 			SDL_RenderCopy(game->renderer, edge_texture, NULL, cell_rect);
 	}
+	if (cell == CELL_KEY)
+	{
+		SDL_RenderCopy(game->renderer, game->textures->key, NULL, cell_rect);
+		edge_texture = get_floor_top_edge(game->textures, game->map, x, y);
+		if (edge_texture)
+			SDL_RenderCopy(game->renderer, edge_texture, NULL, cell_rect);
+	}
 }
 
 /*
@@ -242,7 +249,7 @@ static void	render_cell(t_game *game, SDL_Rect *cell_rect, t_cellType cell, int 
 				SDL_RenderCopy(game->renderer, edge_texture, NULL, cell_rect);
 		}
 	}
-	else if (cell == CELL_EMPTY || cell == CELL_POTION || cell == CELL_TRESOR_EMPTY || cell == CELL_TRESOR_CLOSED || cell == CELL_MONSTER || !game->player->have_key || cell == CELL_TRAP)
+	else if (cell == CELL_EMPTY || cell == CELL_POTION || cell == CELL_TRESOR_EMPTY || cell == CELL_TRESOR_CLOSED || cell == CELL_MONSTER || !game->player->have_key || cell == CELL_TRAP || cell == CELL_KEY)
 	{
 		if (game->textures && game->textures->floor)
 		{
@@ -257,7 +264,7 @@ static void	render_cell(t_game *game, SDL_Rect *cell_rect, t_cellType cell, int 
 				COLOR_EMPTY_B, COLOR_EMPTY_A);
 			SDL_RenderFillRect(game->renderer, cell_rect);
 		}
-		if (cell == CELL_POTION || cell == CELL_TRESOR_EMPTY || cell == CELL_TRESOR_CLOSED)
+		if (cell == CELL_POTION || cell == CELL_TRESOR_EMPTY || cell == CELL_TRESOR_CLOSED || cell == CELL_KEY)
 			draw_obj(game, cell_rect, cell, x, y);
 	}
 	else if (cell == CELL_EXIT)
