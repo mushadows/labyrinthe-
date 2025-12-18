@@ -2,16 +2,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
+#include <time.h>
 
-/*
-** Cree une nouvelle structure de jeu
-** Alloue la memoire et initialise les valeurs par defaut
-** @return pointeur vers la structure t_game creee, NULL en cas d'erreur
-*/
-/*
-** Charge les parametres depuis le fichier settings.txt
-** @param game: pointeur vers la structure de jeu
-*/
 static void	load_game_settings(t_game *game)
 {
 	FILE	*file;
@@ -48,17 +40,18 @@ t_game	*game_create(void)
 	game->camera_y = 0;
 	game->use_wasd = 1;
 	game->movements = 0;
+	game->monsters = NULL;
+	game->monster_count = 0;
+	game->player_moves_since_monster_move = 0;
 	load_game_settings(game);
+	srand(time(NULL));
 	return (game);
 }
 
-/*
-** Detruit une structure de jeu et libere la memoire
-** Nettoie SDL et libere toutes les ressources allouees
-** @param game: pointeur vers la structure de jeu a detruire
-*/
 void	game_destroy(t_game *game)
 {
+	int	i;
+
 	if (!game)
 		return ;
 	game_cleanup(game);
@@ -68,14 +61,20 @@ void	game_destroy(t_game *game)
 		map_destroy(game->map);
 	if (game->player)
 		free(game->player);
+	if (game->monsters)
+	{
+		i = 0;
+		while (i < game->monster_count)
+		{
+			if (game->monsters[i])
+				destroy_monster(game->monsters[i]);
+			i++;
+		}
+		free(game->monsters);
+	}
 	free(game);
 }
 
-/*
-** Initialise SDL et cree la fenetre et le renderer
-** @param game: pointeur vers la structure de jeu a initialiser
-** @return 1 en cas de succes, 0 en cas d'erreur
-*/
 int	game_init(t_game *game)
 {
 	if (!game)
@@ -90,7 +89,7 @@ int	game_init(t_game *game)
 			SDL_WINDOW_SHOWN);
 	if (!game->window)
 	{
-		printf("Erreur création fenêtre: %s\n", SDL_GetError());
+		printf("Erreur crÃ©ation fenÃªtre: %s\n", SDL_GetError());
 		SDL_Quit();
 		return (0);
 	}
@@ -98,7 +97,7 @@ int	game_init(t_game *game)
 			SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 	if (!game->renderer)
 	{
-		printf("Erreur création renderer: %s\n", SDL_GetError());
+		printf("Erreur crÃ©ation renderer: %s\n", SDL_GetError());
 		SDL_DestroyWindow(game->window);
 		SDL_Quit();
 		return (0);
@@ -116,10 +115,6 @@ int	game_init(t_game *game)
 	return (1);
 }
 
-/*
-** Nettoie les ressources SDL (fenetre et renderer)
-** @param game: pointeur vers la structure de jeu a nettoyer
-*/
 void	game_cleanup(t_game *game)
 {
 	if (!game)
@@ -137,20 +132,11 @@ void	game_cleanup(t_game *game)
 	SDL_Quit();
 }
 
-/*
-** Gere l'evenement de fermeture de la fenetre
-** @param game: pointeur vers la structure de jeu
-*/
 static void	handle_quit_event(t_game *game)
 {
 	game->running = 0;
 }
 
-/*
-** Gere les evenements clavier (deplacement et quitter)
-** @param game: pointeur vers la structure de jeu
-** @param key: code de la touche pressee
-*/
 static void	handle_key_event(t_game *game, SDL_Keycode key)
 {
 	if (key == SDLK_ESCAPE)
@@ -169,11 +155,6 @@ static void	handle_key_event(t_game *game, SDL_Keycode key)
 		game_save(game, "save.txt");
 }
 
-/*
-** Traite tous les evenements SDL en attente
-** Gere les evenements de fermeture et les touches du clavier
-** @param game: pointeur vers la structure de jeu
-*/
 void	game_handle_events(t_game *game)
 {
 	SDL_Event	event;
@@ -187,10 +168,6 @@ void	game_handle_events(t_game *game)
 	}
 }
 
-/*
-** Met a jour l'etat du jeu (camera principalement)
-** @param game: pointeur vers la structure de jeu
-*/
 void	game_update(t_game *game)
 {
 	if (!game || !game->map)
@@ -198,20 +175,12 @@ void	game_update(t_game *game)
 	game_update_camera(game);
 }
 
-/*
-** Affiche un object sur une cellule de la carte selon son type
-** @param game: pointeur vers la structure de jeu
-** @param cell_rect: rectangle de la cellule a afficher
-** @param cell: type de cellule a afficher
-** @param x: coordonnee X de la cellule
-** @param y: coordonnee Y de la cellule
-*/
 void	draw_obj(t_game *game, SDL_Rect *cell_rect, t_cellType cell, int x, int y)
 {
+	SDL_Texture	*edge_texture;
+
 	if (cell == CELL_POTION)
 	{
-		SDL_Texture	*edge_texture;
-
 		SDL_RenderCopy(game->renderer, game->textures->potion, NULL, cell_rect);
 		edge_texture = get_floor_top_edge(game->textures, game->map, x, y);
 		if (edge_texture)
@@ -219,8 +188,6 @@ void	draw_obj(t_game *game, SDL_Rect *cell_rect, t_cellType cell, int x, int y)
 	}
 	if (cell == CELL_TRESOR_CLOSED)
 	{
-		SDL_Texture	*edge_texture;
-
 		SDL_RenderCopy(game->renderer, game->textures->tresor_closed, NULL, cell_rect);
 		edge_texture = get_floor_top_edge(game->textures, game->map, x, y);
 		if (edge_texture)
@@ -228,35 +195,17 @@ void	draw_obj(t_game *game, SDL_Rect *cell_rect, t_cellType cell, int x, int y)
 	}
 	if (cell == CELL_TRESOR_EMPTY)
 	{
-		SDL_Texture	*edge_texture;
-
 		SDL_RenderCopy(game->renderer, game->textures->tresor_empty, NULL, cell_rect);
-		edge_texture = get_floor_top_edge(game->textures, game->map, x, y);
-		if (edge_texture)
-			SDL_RenderCopy(game->renderer, edge_texture, NULL, cell_rect);
-	}
-	if (cell == CELL_MONSTER)
-	{
-		SDL_Texture	*edge_texture;
-
-		SDL_RenderCopy(game->renderer, game->textures->monster, NULL, cell_rect);
 		edge_texture = get_floor_top_edge(game->textures, game->map, x, y);
 		if (edge_texture)
 			SDL_RenderCopy(game->renderer, edge_texture, NULL, cell_rect);
 	}
 }
 
-/*
-** Affiche une cellule de la carte selon son type
-** @param game: pointeur vers la structure de jeu
-** @param cell_rect: rectangle de la cellule a afficher
-** @param cell: type de cellule a afficher
-** @param x: coordonnee X de la cellule
-** @param y: coordonnee Y de la cellule
-*/
 static void	render_cell(t_game *game, SDL_Rect *cell_rect, t_cellType cell, int x, int y)
 {
 	SDL_Texture	*wall_texture;
+	SDL_Texture	*edge_texture;
 
 	if (cell == CELL_WALL)
 	{
@@ -273,12 +222,10 @@ static void	render_cell(t_game *game, SDL_Rect *cell_rect, t_cellType cell, int 
 			SDL_RenderFillRect(game->renderer, cell_rect);
 		}
 	}
-	else if (cell == CELL_EMPTY || cell == CELL_POTION || cell == CELL_TRESOR_EMPTY || cell == CELL_TRESOR_CLOSED || cell == CELL_MONSTER)
+	else if (cell == CELL_EMPTY || cell == CELL_POTION || cell == CELL_TRESOR_EMPTY || cell == CELL_TRESOR_CLOSED)
 	{
 		if (game->textures && game->textures->floor)
 		{
-			SDL_Texture	*edge_texture;
-
 			SDL_RenderCopy(game->renderer, game->textures->floor, NULL, cell_rect);
 			edge_texture = get_floor_top_edge(game->textures, game->map, x, y);
 			if (edge_texture)
@@ -290,7 +237,7 @@ static void	render_cell(t_game *game, SDL_Rect *cell_rect, t_cellType cell, int 
 				COLOR_EMPTY_B, COLOR_EMPTY_A);
 			SDL_RenderFillRect(game->renderer, cell_rect);
 		}
-		if (cell == CELL_POTION || cell == CELL_TRESOR_EMPTY || cell == CELL_TRESOR_CLOSED || cell == CELL_MONSTER)
+		if (cell == CELL_POTION || cell == CELL_TRESOR_EMPTY || cell == CELL_TRESOR_CLOSED)
 			draw_obj(game, cell_rect, cell, x, y);
 	}
 	else if (cell == CELL_EXIT)
@@ -305,14 +252,6 @@ static void	render_cell(t_game *game, SDL_Rect *cell_rect, t_cellType cell, int 
 	}
 }
 
-/*
-** Affiche une zone de la carte comprise entre les coordonnees donnees
-** @param game: pointeur vers la structure de jeu
-** @param start_x: coordonnee X de debut
-** @param start_y: coordonnee Y de debut
-** @param end_x: coordonnee X de fin
-** @param end_y: coordonnee Y de fin
-*/
 static void	render_map_cells(t_game *game, int start_x, int start_y, int end_x,
 		int end_y)
 {
@@ -339,10 +278,34 @@ static void	render_map_cells(t_game *game, int start_x, int start_y, int end_x,
 	}
 }
 
-/*
-** Affiche le joueur a sa position actuelle
-** @param game: pointeur vers la structure de jeu
-*/
+static void	render_monsters(t_game *game)
+{
+	SDL_Rect	cell_rect;
+	int			i;
+
+	if (!game->monsters)
+		return ;
+	cell_rect.w = CELL_SIZE;
+	cell_rect.h = CELL_SIZE;
+	i = 0;
+	while (i < game->monster_count)
+	{
+		if (game->monsters[i] && game->monsters[i]->active)
+		{
+			cell_rect.x = (game->monsters[i]->position.x * CELL_SIZE) - game->camera_x;
+			cell_rect.y = (game->monsters[i]->position.y * CELL_SIZE) - game->camera_y;
+			if (game->textures && game->textures->monster)
+				SDL_RenderCopy(game->renderer, game->textures->monster, NULL, &cell_rect);
+			else
+			{
+				SDL_SetRenderDrawColor(game->renderer, 255, 0, 255, 255);
+				SDL_RenderFillRect(game->renderer, &cell_rect);
+			}
+		}
+		i++;
+	}
+}
+
 static void	render_player(t_game *game)
 {
 	SDL_Rect	cell_rect;
@@ -366,10 +329,6 @@ static void	render_player(t_game *game)
 	}
 }
 
-/*
-** Affiche la barre de vie du joueur
-** @param game: pointeur vers la structure de jeu
-*/
 static void	draw_number(SDL_Renderer *renderer, char c, int x, int y, int s);
 static void	render_score_player(t_game *game)
 {
@@ -385,10 +344,6 @@ static void	render_score_player(t_game *game)
 	free(nb);
 }
 
-/*
-** Affiche la barre de vie du joueur
-** @param game: pointeur vers la structure de jeu
-*/
 static void	render_pv_player(t_game *game)
 {
 	SDL_Rect	bg_rect;
@@ -417,11 +372,6 @@ static void	render_pv_player(t_game *game)
 	SDL_RenderFillRect(game->renderer, &life_rect);
 }
 
-/*
-** Affiche l'ensemble du jeu (carte et joueur)
-** Calcule la zone visible et optimise l'affichage
-** @param game: pointeur vers la structure de jeu
-*/
 void	game_render(t_game *game)
 {
 	int	start_x;
@@ -447,17 +397,13 @@ void	game_render(t_game *game)
 	if (end_y > map_get_height(game->map))
 		end_y = map_get_height(game->map);
 	render_map_cells(game, start_x, start_y, end_x, end_y);
+	render_monsters(game);
 	render_player(game);
 	render_score_player(game);
 	render_pv_player(game);
 	SDL_RenderPresent(game->renderer);
 }
 
-/*
-** Boucle principale du jeu
-** Gere les evenements, met a jour et affiche le jeu en continu
-** @param game: pointeur vers la structure de jeu
-*/
 void	game_run(t_game *game)
 {
 	if (!game)
@@ -471,12 +417,86 @@ void	game_run(t_game *game)
 	}
 }
 
-/*
-** Charge une carte depuis un fichier
-** @param game: pointeur vers la structure de jeu
-** @param filename: nom du fichier contenant la carte
-** @return 1 en cas de succes, 0 en cas d'erreur
-*/
+void	game_spawn_monsters(t_game *game)
+{
+	int	i;
+	int	x;
+	int	y;
+	int	attempts;
+
+	if (!game || !game->map)
+		return ;
+	game->monster_count = map_get_width(game->map) / 3;
+	if (game->monster_count < 1)
+		game->monster_count = 1;
+	game->monsters = (t_monster **)malloc(sizeof(t_monster *) * game->monster_count);
+	assert(game->monsters != NULL);
+	i = 0;
+	while (i < game->monster_count)
+	{
+		attempts = 0;
+		while (attempts < 100)
+		{
+			x = rand() % map_get_width(game->map);
+			y = rand() % map_get_height(game->map);
+			if (map_is_valid_position(game->map, x, y)
+				&& (x != game->player->position.x || y != game->player->position.y))
+			{
+				game->monsters[i] = create_monster(x, y);
+				break ;
+			}
+			attempts++;
+		}
+		if (attempts >= 100)
+			game->monsters[i] = create_monster(1, 1);
+		i++;
+	}
+}
+
+void	game_move_monsters(t_game *game)
+{
+	int	i;
+
+	if (!game || !game->monsters)
+		return ;
+	i = 0;
+	while (i < game->monster_count)
+	{
+		if (game->monsters[i] && game->monsters[i]->active)
+			move_monster_random(game->monsters[i], game->map);
+		i++;
+	}
+}
+
+void	game_check_monster_collision(t_game *game)
+{
+	int	i;
+
+	if (!game || !game->monsters || !game->player)
+		return ;
+	i = 0;
+	while (i < game->monster_count)
+	{
+		if (game->monsters[i] && game->monsters[i]->active)
+		{
+			if (game->monsters[i]->position.x == game->player->position.x
+				&& game->monsters[i]->position.y == game->player->position.y)
+			{
+				add_life(game->player, MONSTER);
+				game->monsters[i]->active = 0;
+				if (game->player->life <= 0)
+				{
+					game_render(game);
+					SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Game Over",
+						"Vous Ãªtes mort !", game->window);
+					game->running = 0;
+				}
+			}
+		}
+		i++;
+	}
+}
+
 int	game_load_map(t_game *game, const char *filename)
 {
 	t_position	start_pos;
@@ -502,6 +522,7 @@ int	game_load_map(t_game *game, const char *filename)
 	start_pos.x = map_get_player_x(game->map);
 	start_pos.y = map_get_player_y(game->map);
 	tp_player(game->player, start_pos);
+	game_spawn_monsters(game);
 	game_update_camera(game);
 	return (1);
 }
@@ -518,21 +539,8 @@ void	game_apply_object(t_game *game, t_cellType cell)
 		add_life(game->player, CHEST);
 		game->map->grid[game->player->position.y][game->player->position.x] = CELL_TRESOR_EMPTY;
 	}
-	if (cell == CELL_MONSTER)
-	{
-		add_life(game->player, MONSTER);
-		// game->map->grid[game->player->position.y][game->player->position.x] = CELL_EMPTY;
-	}
 }
 
-/*
-** Deplace le joueur selon le deplacement demande
-** Verifie que la nouvelle position est valide avant le deplacement
-** Utilise les fonctions de player.c pour le deplacement
-** @param game: pointeur vers la structure de jeu
-** @param dx: deplacement en X
-** @param dy: deplacement en Y
-*/
 void	game_move_player(t_game *game, int dx, int dy)
 {
 	int			new_x;
@@ -565,16 +573,23 @@ void	game_move_player(t_game *game, int dx, int dy)
 	else
 	{
 		game->movements++;
+		game->player_moves_since_monster_move++;
+		if (game->player_moves_since_monster_move >= 3)
+		{
+			game_move_monsters(game);
+			game->player_moves_since_monster_move = 0;
+		}
+		game_check_monster_collision(game);
 		cell = map_get_cell(game->map, new_x, new_y);
 		if (cell == CELL_EXIT)
 		{
 			map_set_player_position(game->map, new_x, new_y);
 			game_render(game);
 			SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, "Victoire !",
-				"Félicitations ! Vous avez atteint la sortie !", game->window);
+				"FÃ©licitations ! Vous avez atteint la sortie !", game->window);
 			game->running = 0;
 		}
-		else if (cell == CELL_POTION || cell == CELL_TRESOR_CLOSED || cell == CELL_MONSTER)
+		else if (cell == CELL_POTION || cell == CELL_TRESOR_CLOSED)
 		{
 			map_set_player_position(game->map, new_x, new_y);
 			game_apply_object(game, cell);
@@ -585,11 +600,6 @@ void	game_move_player(t_game *game, int dx, int dy)
 	}
 }
 
-/*
-** Met a jour la position de la camera pour suivre le joueur
-** Centre la camera sur le joueur tout en respectant les limites de la carte
-** @param game: pointeur vers la structure de jeu
-*/
 void	game_update_camera(t_game *game)
 {
 	int	max_camera_x;
@@ -611,29 +621,36 @@ void	game_update_camera(t_game *game)
 		game->camera_y = max_camera_y;
 }
 
-/*
-** Sauvegarde l'etat actuel du jeu dans un fichier
-** @param game: pointeur vers la structure de jeu
-** @param filename: nom du fichier de sauvegarde
-** @return 1 en cas de succes, 0 en cas d'erreur
-*/
 int	game_save(t_game *game, const char *filename)
 {
 	FILE	*file;
 	char	map_filename[256];
+	int		i;
 
 	if (!game || !game->player || !game->map)
 		return (0);
 	file = fopen(filename, "w");
 	if (!file)
 	{
-		printf("Erreur: impossible de créer le fichier de sauvegarde %s\n", filename);
+		printf("Erreur: impossible de crÃ©er le fichier de sauvegarde %s\n", filename);
 		return (0);
 	}
 	fprintf(file, "PLAYER_POS %d %d\n", game->player->position.x, game->player->position.y);
 	fprintf(file, "PLAYER_LIFE %d\n", game->player->life);
 	fprintf(file, "PLAYER_SCORE %d\n", game->movements);
 	fprintf(file, "USE_WASD %d\n", game->use_wasd);
+	fprintf(file, "MONSTER_COUNT %d\n", game->monster_count);
+	fprintf(file, "PLAYER_MOVES_MONSTER %d\n", game->player_moves_since_monster_move);
+	i = 0;
+	while (i < game->monster_count)
+	{
+		if (game->monsters[i])
+		{
+			fprintf(file, "MONSTER %d %d %d\n", game->monsters[i]->position.x,
+				game->monsters[i]->position.y, game->monsters[i]->active);
+		}
+		i++;
+	}
 	snprintf(map_filename, sizeof(map_filename), "maps/saved_map.txt");
 	fprintf(file, "MAP_FILE %s\n", map_filename);
 	fclose(file);
@@ -642,16 +659,10 @@ int	game_save(t_game *game, const char *filename)
 		printf("Erreur: impossible de sauvegarder la carte\n");
 		return (0);
 	}
-	printf("Partie sauvegardée dans %s\n", filename);
+	printf("Partie sauvegardÃ©e dans %s\n", filename);
 	return (1);
 }
 
-/*
-** Charge l'etat du jeu depuis un fichier de sauvegarde
-** @param game: pointeur vers la structure de jeu
-** @param filename: nom du fichier de sauvegarde
-** @return 1 en cas de succes, 0 en cas d'erreur
-*/
 int	game_load(t_game *game, const char *filename)
 {
 	FILE		*file;
@@ -661,6 +672,12 @@ int	game_load(t_game *game, const char *filename)
 	int			life;
 	int			use_wasd;
 	char		map_filename[256];
+	int			monster_count;
+	int			monster_x;
+	int			monster_y;
+	int			monster_active;
+	int			i;
+	int			player_moves_monster;
 
 	if (!game)
 		return (0);
@@ -671,6 +688,8 @@ int	game_load(t_game *game, const char *filename)
 		return (0);
 	}
 	map_filename[0] = '\0';
+	monster_count = 0;
+	i = 0;
 	while (fgets(buffer, sizeof(buffer), file))
 	{
 		if (sscanf(buffer, "PLAYER_POS %d %d", &pos.x, &pos.y) == 2)
@@ -678,7 +697,7 @@ int	game_load(t_game *game, const char *filename)
 			if (game->player)
 				tp_player(game->player, pos);
 		}
-		if (sscanf(buffer, "PLAYER_SCORE %d", &score) == 1)
+		else if (sscanf(buffer, "PLAYER_SCORE %d", &score) == 1)
 		{
 			if (score)
 				game->movements = score;
@@ -692,7 +711,35 @@ int	game_load(t_game *game, const char *filename)
 			game->use_wasd = use_wasd;
 		else if (sscanf(buffer, "MAP_FILE %s", map_filename) == 1)
 		{
-			// Le nom du fichier de carte a ete recupere
+		}
+		else if (sscanf(buffer, "MONSTER_COUNT %d", &monster_count) == 1)
+		{
+			if (game->monsters)
+			{
+				while (i < game->monster_count)
+				{
+					if (game->monsters[i])
+						destroy_monster(game->monsters[i]);
+					i++;
+				}
+				free(game->monsters);
+			}
+			game->monster_count = monster_count;
+			game->monsters = (t_monster **)malloc(sizeof(t_monster *) * monster_count);
+			i = 0;
+		}
+		else if (sscanf(buffer, "PLAYER_MOVES_MONSTER %d", &player_moves_monster) == 1)
+		{
+			game->player_moves_since_monster_move = player_moves_monster;
+		}
+		else if (sscanf(buffer, "MONSTER %d %d %d", &monster_x, &monster_y, &monster_active) == 3)
+		{
+			if (i < game->monster_count)
+			{
+				game->monsters[i] = create_monster(monster_x, monster_y);
+				game->monsters[i]->active = monster_active;
+				i++;
+			}
 		}
 	}
 	fclose(file);
@@ -703,19 +750,15 @@ int	game_load(t_game *game, const char *filename)
 		game->map = map_create();
 		if (!map_load_from_file(game->map, map_filename))
 		{
-			printf("Erreur: impossible de charger la carte sauvegardée %s\n", map_filename);
+			printf("Erreur: impossible de charger la carte sauvegardÃ©e %s\n", map_filename);
 			return (0);
 		}
 	}
 	game_update_camera(game);
-	printf("Partie chargée depuis %s\n", filename);
+	printf("Partie chargÃ©e depuis %s\n", filename);
 	return (1);
 }
 
-/*
-** Sauvegarde les parametres du jeu
-** @param use_wasd: si WASD est active
-*/
 static void	save_game_settings(int use_wasd)
 {
 	FILE	*file;
@@ -727,9 +770,6 @@ static void	save_game_settings(int use_wasd)
 	fclose(file);
 }
 
-/*
-** Dessine un pixel pour le texte
-*/
 static void	draw_text_pixel(SDL_Renderer *renderer, int x, int y, int size)
 {
 	SDL_Rect	rect;
@@ -741,9 +781,6 @@ static void	draw_text_pixel(SDL_Renderer *renderer, int x, int y, int size)
 	SDL_RenderFillRect(renderer, &rect);
 }
 
-/*
-** Dessine des lettres simples pour le menu pause
-*/
 static void	draw_pause_char(SDL_Renderer *renderer, char c, int x, int y, int s)
 {
 	if (c == 'R')
@@ -994,7 +1031,6 @@ static void	draw_number(SDL_Renderer *renderer, char c, int x, int y, int s)
 	{
 		draw_text_pixel(renderer, x, y, s);
 		draw_text_pixel(renderer, x + s, y, s);
-		// draw_text_pixel(renderer, x + 2*s, y, s);
 		draw_text_pixel(renderer, x + 2*s, y + s, s);
 		draw_text_pixel(renderer, x, y + 2*s, s);
 		draw_text_pixel(renderer, x + s, y + 2*s, s);
@@ -1002,7 +1038,6 @@ static void	draw_number(SDL_Renderer *renderer, char c, int x, int y, int s)
 		draw_text_pixel(renderer, x + 2*s, y + 3*s, s);
 		draw_text_pixel(renderer, x, y + 4*s, s);
 		draw_text_pixel(renderer, x + s, y + 4*s, s);
-		// draw_text_pixel(renderer, x + 2*s, y + 4*s, s);
 	}
 	else if (c == '4')
 	{
@@ -1088,9 +1123,6 @@ static void	draw_number(SDL_Renderer *renderer, char c, int x, int y, int s)
 	}
 }
 
-/*
-** Dessine un texte simple dans le menu pause
-*/
 static void	draw_pause_text(SDL_Renderer *renderer, const char *text, int x,
 		int y, int size)
 {
@@ -1118,13 +1150,6 @@ static void	draw_pause_text(SDL_Renderer *renderer, const char *text, int x,
 	}
 }
 
-/*
-** Dessine un bouton dans le menu pause
-** @param renderer: le renderer SDL
-** @param text: le texte du bouton
-** @param y: position Y
-** @param selected: si le bouton est selectionne
-*/
 static void	draw_pause_button(SDL_Renderer *renderer, const char *text, int y,
 		int selected)
 {
@@ -1150,11 +1175,6 @@ static void	draw_pause_button(SDL_Renderer *renderer, const char *text, int y,
 	draw_pause_text(renderer, text, WINDOW_WIDTH / 2 - 70, y + 10, 3);
 }
 
-/*
-** Affiche le menu pause
-** @param game: pointeur vers la structure de jeu
-** @param selected: option selectionnee
-*/
 static void	render_pause_menu(t_game *game, int selected)
 {
 	SDL_Rect	overlay;
@@ -1182,10 +1202,6 @@ static void	render_pause_menu(t_game *game, int selected)
 	SDL_RenderPresent(game->renderer);
 }
 
-/*
-** Menu pause en jeu
-** @param game: pointeur vers la structure de jeu
-*/
 void	game_pause_menu(t_game *game)
 {
 	SDL_Event	event;
