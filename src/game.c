@@ -153,6 +153,7 @@ static void	handle_key_event(t_game *game, SDL_Keycode key)
 		game->use_wasd = !game->use_wasd;
 	else if (key == SDLK_F5)
 		game_save(game, "save.txt");
+	printf("156%d", game->running);
 }
 
 void	game_handle_events(t_game *game)
@@ -444,7 +445,7 @@ int	game_run(t_game *game)
 		game_render(game);
 		SDL_Delay(16);
 	}
-	return run;
+	return game->running;
 }
 
 void	game_spawn_monsters(t_game *game)
