@@ -67,7 +67,7 @@ void	game_cleanup(t_game *game);
 void	game_handle_events(t_game *game);
 void	game_update(t_game *game);
 void	game_render(t_game *game);
-void	game_run(t_game *game);
+int		game_run(t_game *game);
 int		game_load_map(t_game *game, const char *filename);
 
 void	game_move_player(t_game *game, int dx, int dy);

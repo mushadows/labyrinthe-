@@ -424,11 +424,14 @@ void	game_render(t_game *game)
 	SDL_RenderPresent(game->renderer);
 }
 
-void	game_run(t_game *game)
+int	game_run(t_game *game)
 {
+	int	run;
+
 	if (!game)
-		return ;
-	while (game->running)
+		return 0;
+	run = game->running;
+	while (game->running && game->running == run)
 	{
 		if (game->player->life <= 0)
 		{
@@ -441,6 +444,7 @@ void	game_run(t_game *game)
 		game_render(game);
 		SDL_Delay(16);
 	}
+	return run;
 }
 
 void	game_spawn_monsters(t_game *game)
@@ -637,7 +641,7 @@ void	game_move_player(t_game *game, int dx, int dy)
 			game_render(game);
 			SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, "Victoire !",
 				"FÃ©licitations ! Vous avez atteint la sortie !", game->window);
-			game->running = 0;
+			game->running++;
 		}
 		else if (cell == CELL_POTION || cell == CELL_TRESOR_CLOSED || cell == CELL_MONSTER || cell == CELL_KEY || (cell == CELL_TRAP && (game->movements % 4 == 0 || (game->movements - 1) % 4 == 0)))
 		{
