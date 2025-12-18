@@ -132,7 +132,7 @@ int	main(int argc, char *argv[])
 		{
 			menu_destroy(menu);
 			result = start_new_game(1);
-			while (result <= 2 && result != 0)
+			while (result <= 5 && result != 0)
 				result = start_new_game(result);
 			result = EXIT_SUCCESS;
 			break ;
