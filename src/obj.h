@@ -8,6 +8,7 @@
 
 # include "position.h"
 # include "player.h"
+# include "map.h"
 # include <stdlib.h>
 
 /*
@@ -29,5 +30,12 @@ t_obj	*create_obj(char name, int effect, t_position position);
 // Ajoute des PV (retire avec un negatif)
 // Si max_pv est egale a -1 on considere qu'il n'y a pas de limite (max)
 void    use_obj(t_player *player, t_obj obj);
+void spawn_all_objects(t_map *map);
 
 #endif
+
+
+
+
+
+
