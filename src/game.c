@@ -642,6 +642,7 @@ void	game_move_player(t_game *game, int dx, int dy)
 			SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, "Victoire !",
 				"FÃ©licitations ! Vous avez atteint la sortie !", game->window);
 			game->running++;
+			printf("run : %d\n", game->running);
 		}
 		else if (cell == CELL_POTION || cell == CELL_TRESOR_CLOSED || cell == CELL_MONSTER || cell == CELL_KEY || (cell == CELL_TRAP && (game->movements % 4 == 0 || (game->movements - 1) % 4 == 0)))
 		{
