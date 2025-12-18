@@ -548,6 +548,7 @@ int	game_load_map(t_game *game, const char *filename)
 	start_pos.x = map_get_player_x(game->map);
 	start_pos.y = map_get_player_y(game->map);
 	tp_player(game->player, start_pos);
+	spawn_all_objects(game->map);
 	game_spawn_monsters(game);
 	game_update_camera(game);
 	return (1);
