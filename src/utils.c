@@ -204,3 +204,13 @@ char	*itoa(int nb)
 	return cnb;
 }
 
+int	rand_in_line(int size)
+{
+	int	my_rand;
+	int	bdr_marge;
+
+	srand(time(0));
+	bdr_marge = 3;
+	my_rand = rand() % size - bdr_marge * 2;
+	return my_rand + bdr_marge;
+}

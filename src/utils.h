@@ -59,5 +59,6 @@ SDL_Texture	*get_wall_texture(t_textures *textures, const void *map, int x, int 
 SDL_Texture	*get_floor_top_edge(t_textures *textures, const void *map, int x, int y);
 
 char	*itoa(int nb);
+int		rand_in_line(int size);
 
 #endif
