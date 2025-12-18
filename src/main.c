@@ -7,7 +7,7 @@
 ** Lance une nouvelle partie
 ** @return EXIT_SUCCESS si le jeu s'est execute correctement, EXIT_FAILURE sinon
 */
-static int	start_new_game(void)
+static int	start_new_game(int difficulty)
 {
 	t_game	*game;
 
@@ -37,10 +37,11 @@ static int	start_new_game(void)
 	printf("  - F5 pour sauvegarder\n");
 	printf("  - Échap pour quitter\n");
 	printf("\nLancement du jeu...\n");
+	game->running = difficulty;
 	game_run(game);
 	printf("Fermeture du jeu...\n");
 	game_destroy(game);
-	return (EXIT_SUCCESS);
+	return (game->running);
 }
 
 /*
@@ -127,13 +128,19 @@ int	main(int argc, char *argv[])
 		if (choice == MENU_PLAY)
 		{
 			menu_destroy(menu);
-			result = start_new_game();
+			result = start_new_game(1);
+			while (result <= 5 && result != 0)
+				result = start_new_game(result);
+			result = EXIT_SUCCESS;
 			break ;
 		}
 		else if (choice == MENU_LOAD)
 		{
 			menu_destroy(menu);
 			result = load_saved_game();
+			while (result <= 5 && result != 0)
+				result = start_new_game(result);
+			result = EXIT_SUCCESS;
 			break ;
 		}
 		else if (choice == MENU_SETTINGS)

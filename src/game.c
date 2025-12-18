@@ -452,7 +452,7 @@ void	game_spawn_monsters(t_game *game)
 
 	if (!game || !game->map)
 		return ;
-	game->monster_count = map_get_width(game->map) / 3;
+	game->monster_count = map_get_width(game->map) / 3 + 4 * game->running;
 	if (game->monster_count < 1)
 		game->monster_count = 1;
 	game->monsters = (t_monster **)malloc(sizeof(t_monster *) * game->monster_count);
