@@ -3,6 +3,8 @@
 #ifndef PLAYER_H
 # define PLAYER_H
 
+# include <stdlib.h>
+
 /* Limite du joueur */
 # define MAX_PV 100
 

@@ -1,4 +1,4 @@
-#include "../lab.h"
+#include "player.h"
 #include <assert.h>
 
 /*
