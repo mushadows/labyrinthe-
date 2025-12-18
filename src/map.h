@@ -1,6 +1,8 @@
 #ifndef MAP_H
 # define MAP_H
 
+# include "utils.h"
+
 /*
 ** Enumeration des types de cellules dans le labyrinthe
 */

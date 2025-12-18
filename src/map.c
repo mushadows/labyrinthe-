@@ -499,7 +499,7 @@ void	sauver_labyrinthe(t_Direction grille[TAILLE][TAILLE])
 		}
 		i++;
 	}
-	tab_final[h - 2][w - 2] = 'E';
+	tab_final[h - 2][rand_in_line(TAILLE)] = CELL_EXIT;
 	f = fopen("maps/labyrinthe.txt", "w");
 	if (!f)
 	{

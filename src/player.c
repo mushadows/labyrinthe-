@@ -16,7 +16,7 @@ t_player	*create_player(void)
 	player->max_life = 0;
 	player->position.x = 0;
 	player->position.y = 0;
-	player->have_key = 0;
+	player->have_key = 1;
 	return (player);
 }
 
