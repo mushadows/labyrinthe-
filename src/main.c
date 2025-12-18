@@ -9,6 +9,7 @@
 */
 static int	start_new_game(int difficulty)
 {
+	int		run;
 	t_game	*game;
 
 	printf("Chargement du jeu...\n");
@@ -38,10 +39,10 @@ static int	start_new_game(int difficulty)
 	printf("  - Échap pour quitter\n");
 	printf("\nLancement du jeu...\n");
 	game->running = difficulty;
-	game_run(game);
+	run = game_run(game);
 	printf("Fermeture du jeu...\n");
 	game_destroy(game);
-	return (game->running);
+	return (run);
 }
 
 /*
@@ -50,6 +51,7 @@ static int	start_new_game(int difficulty)
 */
 static int	load_saved_game(void)
 {
+	int		run;
 	t_game	*game;
 
 	printf("Chargement d'une partie sauvegardée...\n");
@@ -85,10 +87,10 @@ static int	load_saved_game(void)
 	printf("  - F5 pour sauvegarder\n");
 	printf("  - Échap pour quitter\n");
 	printf("\nLancement du jeu...\n");
-	game_run(game);
+	run = game_run(game);
 	printf("Fermeture du jeu...\n");
 	game_destroy(game);
-	return (EXIT_SUCCESS);
+	return (run);
 }
 
 /*
@@ -122,7 +124,8 @@ int	main(int argc, char *argv[])
 		menu_destroy(menu);
 		return (EXIT_FAILURE);
 	}
-	while (1)
+	result = 1;
+	while (result)
 	{
 		choice = menu_run(menu);
 		if (choice == MENU_PLAY)
