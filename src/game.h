@@ -6,6 +6,7 @@
 # include "player.h"
 # include "utils.h"
 # include "obj.h"
+# include "monster.h"
 
 /* Dimensions de la fenetre */
 # define WINDOW_WIDTH 800
@@ -52,6 +53,9 @@ typedef struct s_game
 	int				camera_y;
 	int				use_wasd;
 	int				movements;
+	t_monster		**monsters;
+	int				monster_count;
+	int				player_moves_since_monster_move;
 }	t_game;
 
 /* Fonctions de gestion du jeu */
@@ -75,5 +79,10 @@ int		game_load(t_game *game, const char *filename);
 
 /* Menu pause en jeu */
 void	game_pause_menu(t_game *game);
+
+/* Fonctions pour les monstres */
+void	game_spawn_monsters(t_game *game);
+void	game_move_monsters(t_game *game);
+void	game_check_monster_collision(t_game *game);
 
 #endif
