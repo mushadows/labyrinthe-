@@ -15,7 +15,8 @@ typedef enum s_cellType
 	CELL_POTION = 'P',
 	CELL_KEY = 'K',
 	CELL_TRESOR_CLOSED = 'C',
-	CELL_TRESOR_EMPTY = 'T',
+	CELL_TRESOR_EMPTY = 'e',
+	CELL_TRAP = 'T',
 	CELL_MONSTER = 'M'
 }			t_cellType;
 

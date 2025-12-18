@@ -25,6 +25,7 @@ typedef struct s_textures
 	SDL_Texture	*tresor_empty;
 	SDL_Texture	*key;
 	SDL_Texture	*monster;
+	SDL_Texture	*trap;
 }	t_textures;
 
 /*

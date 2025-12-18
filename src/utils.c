@@ -72,6 +72,8 @@ t_textures	*load_textures(SDL_Renderer *renderer)
 			"0x72_16x16DungeonTileset.v5/items/weapon_sword_small.png"); // to complete
 	textures->monster = load_texture(renderer,
 			"0x72_16x16DungeonTileset.v5/items/monster_orc.png");
+	textures->trap = load_texture(renderer,
+			"0x72_DungeonTilesetII_v1.7/frames/floor_spikes_anim_f0.png");
 	if (!textures->wall_left || !textures->wall_right || !textures->wall_top
 		|| !textures->wall_corner_ne || !textures->wall_corner_nw
 		|| !textures->wall_center || !textures->floor || !textures->exit
