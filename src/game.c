@@ -235,6 +235,15 @@ void	draw_obj(t_game *game, SDL_Rect *cell_rect, t_cellType cell, int x, int y)
 		if (edge_texture)
 			SDL_RenderCopy(game->renderer, edge_texture, NULL, cell_rect);
 	}
+	if (cell == CELL_KEY)
+	{
+		SDL_Texture	*edge_texture;
+
+		SDL_RenderCopy(game->renderer, game->textures->key, NULL, cell_rect);
+		edge_texture = get_floor_top_edge(game->textures, game->map, x, y);
+		if (edge_texture)
+			SDL_RenderCopy(game->renderer, edge_texture, NULL, cell_rect);
+	}
 	if (cell == CELL_MONSTER)
 	{
 		SDL_Texture	*edge_texture;
@@ -273,7 +282,7 @@ static void	render_cell(t_game *game, SDL_Rect *cell_rect, t_cellType cell, int 
 			SDL_RenderFillRect(game->renderer, cell_rect);
 		}
 	}
-	else if (cell == CELL_EMPTY || cell == CELL_POTION || cell == CELL_TRESOR_EMPTY || cell == CELL_TRESOR_CLOSED || cell == CELL_MONSTER)
+	else if (cell == CELL_EMPTY || cell == CELL_POTION || cell == CELL_TRESOR_EMPTY || cell == CELL_TRESOR_CLOSED || cell == CELL_MONSTER || !game->player->have_key)
 	{
 		if (game->textures && game->textures->floor)
 		{
@@ -290,7 +299,7 @@ static void	render_cell(t_game *game, SDL_Rect *cell_rect, t_cellType cell, int 
 				COLOR_EMPTY_B, COLOR_EMPTY_A);
 			SDL_RenderFillRect(game->renderer, cell_rect);
 		}
-		if (cell == CELL_POTION || cell == CELL_TRESOR_EMPTY || cell == CELL_TRESOR_CLOSED || cell == CELL_MONSTER)
+		if (cell == CELL_POTION || cell == CELL_TRESOR_EMPTY || cell == CELL_TRESOR_CLOSED || cell == CELL_MONSTER || cell == CELL_KEY)
 			draw_obj(game, cell_rect, cell, x, y);
 	}
 	else if (cell == CELL_EXIT)
@@ -464,6 +473,12 @@ void	game_run(t_game *game)
 		return ;
 	while (game->running)
 	{
+		if (game->player->life <= 0)
+		{
+			SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, "Defaite !",
+				"Vous avez perdu :(", game->window);
+			game->running = 0;
+		}
 		game_handle_events(game);
 		game_update(game);
 		game_render(game);
@@ -523,6 +538,11 @@ void	game_apply_object(t_game *game, t_cellType cell)
 		add_life(game->player, MONSTER);
 		// game->map->grid[game->player->position.y][game->player->position.x] = CELL_EMPTY;
 	}
+	if (cell == CELL_KEY)
+	{
+		game->player->have_key++;
+		game->map->grid[game->player->position.y][game->player->position.x] = CELL_EMPTY;
+	}
 }
 
 /*
@@ -566,7 +586,7 @@ void	game_move_player(t_game *game, int dx, int dy)
 	{
 		game->movements++;
 		cell = map_get_cell(game->map, new_x, new_y);
-		if (cell == CELL_EXIT)
+		if (cell == CELL_EXIT && game->player->have_key == 1)
 		{
 			map_set_player_position(game->map, new_x, new_y);
 			game_render(game);
@@ -574,7 +594,7 @@ void	game_move_player(t_game *game, int dx, int dy)
 				"Félicitations ! Vous avez atteint la sortie !", game->window);
 			game->running = 0;
 		}
-		else if (cell == CELL_POTION || cell == CELL_TRESOR_CLOSED || cell == CELL_MONSTER)
+		else if (cell == CELL_POTION || cell == CELL_TRESOR_CLOSED || cell == CELL_MONSTER || cell == CELL_KEY)
 		{
 			map_set_player_position(game->map, new_x, new_y);
 			game_apply_object(game, cell);
@@ -633,6 +653,7 @@ int	game_save(t_game *game, const char *filename)
 	fprintf(file, "PLAYER_POS %d %d\n", game->player->position.x, game->player->position.y);
 	fprintf(file, "PLAYER_LIFE %d\n", game->player->life);
 	fprintf(file, "PLAYER_SCORE %d\n", game->movements);
+	fprintf(file, "PLAYER_KEY %d\n", game->player->have_key);
 	fprintf(file, "USE_WASD %d\n", game->use_wasd);
 	snprintf(map_filename, sizeof(map_filename), "maps/saved_map.txt");
 	fprintf(file, "MAP_FILE %s\n", map_filename);
@@ -660,6 +681,7 @@ int	game_load(t_game *game, const char *filename)
 	int			score;
 	int			life;
 	int			use_wasd;
+	int			have_key;
 	char		map_filename[256];
 
 	if (!game)
@@ -687,6 +709,10 @@ int	game_load(t_game *game, const char *filename)
 		{
 			if (game->player)
 				game->player->life = life;
+		}
+		else if (sscanf(buffer, "PLAYER_KEY %d", &have_key) == 1)
+		{
+			game->player->have_key = have_key;
 		}
 		else if (sscanf(buffer, "USE_WASD %d", &use_wasd) == 1)
 			game->use_wasd = use_wasd;

@@ -68,6 +68,8 @@ t_textures	*load_textures(SDL_Renderer *renderer)
 			"0x72_16x16DungeonTileset.v5/items/chest_golden_closed.png");
 	textures->tresor_empty = load_texture(renderer,
 			"0x72_16x16DungeonTileset.v5/items/chest_golden_open_empty.png");
+	textures->key = load_texture(renderer,
+			"0x72_16x16DungeonTileset.v5/items/weapon_sword_small.png"); // to complete
 	textures->monster = load_texture(renderer,
 			"0x72_16x16DungeonTileset.v5/items/monster_orc.png");
 	if (!textures->wall_left || !textures->wall_right || !textures->wall_top

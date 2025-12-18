@@ -13,6 +13,7 @@ typedef struct s_player
 	int			life;
 	int			max_life;
 	t_position	position;
+	int			have_key;
 }				t_player;
 
 t_player	*create_player(void);

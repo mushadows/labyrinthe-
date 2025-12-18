@@ -11,6 +11,7 @@ typedef enum s_cellType
 	CELL_PLAYER = '@',
 	CELL_EXIT = 'E',
 	CELL_POTION = 'P',
+	CELL_KEY = 'K',
 	CELL_TRESOR_CLOSED = 'C',
 	CELL_TRESOR_EMPTY = 'T',
 	CELL_MONSTER = 'M'

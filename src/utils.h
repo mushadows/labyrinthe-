@@ -21,6 +21,7 @@ typedef struct s_textures
 	SDL_Texture	*potion;
 	SDL_Texture	*tresor_closed;
 	SDL_Texture	*tresor_empty;
+	SDL_Texture	*key;
 	SDL_Texture	*monster;
 }	t_textures;
 
