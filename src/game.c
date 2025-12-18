@@ -230,7 +230,19 @@ static void	render_cell(t_game *game, SDL_Rect *cell_rect, t_cellType cell, int 
 			SDL_RenderFillRect(game->renderer, cell_rect);
 		}
 	}
-	else if (cell == CELL_EMPTY || cell == CELL_POTION || cell == CELL_TRESOR_EMPTY || cell == CELL_TRESOR_CLOSED)
+	else if (cell == CELL_TRAP && (game->movements % 4 == 0 || (game->movements - 1) % 4 == 0))
+	{
+		if (game->textures && game->textures->trap)
+		{
+			SDL_Texture	*edge_texture;
+
+			SDL_RenderCopy(game->renderer, game->textures->trap, NULL, cell_rect);
+			edge_texture = get_floor_top_edge(game->textures, game->map, x, y);
+			if (edge_texture)
+				SDL_RenderCopy(game->renderer, edge_texture, NULL, cell_rect);
+		}
+	}
+	else if (cell == CELL_EMPTY || cell == CELL_POTION || cell == CELL_TRESOR_EMPTY || cell == CELL_TRESOR_CLOSED || cell == CELL_MONSTER || !game->player->have_key || cell == CELL_TRAP)
 	{
 		if (game->textures && game->textures->floor)
 		{
@@ -553,6 +565,22 @@ void	game_apply_object(t_game *game, t_cellType cell)
 		add_life(game->player, CHEST);
 		game->map->grid[game->player->position.y][game->player->position.x] = CELL_TRESOR_EMPTY;
 	}
+	if (cell == CELL_MONSTER)
+	{
+		add_life(game->player, MONSTER);
+		// game->map->grid[game->player->position.y][game->player->position.x] = CELL_EMPTY;
+	}
+	if (cell == CELL_KEY)
+	{
+		game->player->have_key++;
+		game->map->grid[game->player->position.y][game->player->position.x] = CELL_EMPTY;
+	}
+	if (cell == CELL_TRAP && (game->movements % 4 == 0 || (game->movements - 1) % 4 == 0))
+	{
+		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, "Defaite !",
+			"Vous avez perdu :(", game->window);
+		game->running = 0;
+	}
 }
 
 /*
@@ -611,11 +639,11 @@ void	game_move_player(t_game *game, int dx, int dy)
 				"FÃ©licitations ! Vous avez atteint la sortie !", game->window);
 			game->running = 0;
 		}
-		else if (cell == CELL_POTION || cell == CELL_TRESOR_CLOSED)
+		else if (cell == CELL_POTION || cell == CELL_TRESOR_CLOSED || cell == CELL_MONSTER || cell == CELL_KEY || (cell == CELL_TRAP && (game->movements % 4 == 0 || (game->movements - 1) % 4 == 0)))
 		{
 			map_set_player_position(game->map, new_x, new_y);
-			game_apply_object(game, cell);
 			game_render(game);
+			game_apply_object(game, cell);
 		}
 		else
 			map_set_player_position(game->map, new_x, new_y);
