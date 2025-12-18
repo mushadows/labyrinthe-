@@ -125,19 +125,15 @@ int	main(int argc, char *argv[])
 		return (EXIT_FAILURE);
 	}
 	result = 1;
-	while (result > 0 && result < 5)
+	while (result)
 	{
-		printf("%d\n", result);
 		choice = menu_run(menu);
 		if (choice == MENU_PLAY)
 		{
 			menu_destroy(menu);
 			result = start_new_game(1);
-			while (result <= 5 && result != 0)
-			{
-				printf("%d\n", result);
+			while (result <= 2 && result != 0)
 				result = start_new_game(result);
-			}
 			result = EXIT_SUCCESS;
 			break ;
 		}
