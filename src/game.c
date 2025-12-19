@@ -89,7 +89,7 @@ int	game_init(t_game *game)
 			SDL_WINDOW_SHOWN);
 	if (!game->window)
 	{
-		printf("Erreur crÃ©ation fenÃªtre: %s\n", SDL_GetError());
+		printf("Erreur creation fenÃªtre: %s\n", SDL_GetError());
 		SDL_Quit();
 		return (0);
 	}
@@ -97,7 +97,7 @@ int	game_init(t_game *game)
 			SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 	if (!game->renderer)
 	{
-		printf("Erreur crÃ©ation renderer: %s\n", SDL_GetError());
+		printf("Erreur creation renderer: %s\n", SDL_GetError());
 		SDL_DestroyWindow(game->window);
 		SDL_Quit();
 		return (0);
@@ -525,7 +525,7 @@ void	game_check_monster_collision(t_game *game)
 				{
 					game_render(game);
 					SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Game Over",
-						"Vous Ãªtes mort !", game->window);
+						"Vous etes mort !", game->window);
 					game->running = 0;
 				}
 			}
@@ -648,7 +648,7 @@ void	game_move_player(t_game *game, int dx, int dy)
 			map_set_player_position(game->map, new_x, new_y);
 			game_render(game);
 			SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, "Victoire !",
-				"FÃ©licitations ! Vous avez atteint la sortie !", game->window);
+				"Felicitations ! Vous avez atteint la sortie !", game->window);
 			game->running++;
 		}
 		else if (cell == CELL_POTION || cell == CELL_TRESOR_CLOSED || cell == CELL_MONSTER || cell == CELL_KEY || (cell == CELL_TRAP && (game->movements % 4 == 0 || (game->movements - 1) % 4 == 0)))
@@ -694,7 +694,7 @@ int	game_save(t_game *game, const char *filename)
 	file = fopen(filename, "w");
 	if (!file)
 	{
-		printf("Erreur: impossible de crÃ©er le fichier de sauvegarde %s\n", filename);
+		printf("Erreur: impossible de creer le fichier de sauvegarde %s\n", filename);
 		return (0);
 	}
 	fprintf(file, "PLAYER_POS %d %d\n", game->player->position.x, game->player->position.y);
@@ -722,7 +722,7 @@ int	game_save(t_game *game, const char *filename)
 		printf("Erreur: impossible de sauvegarder la carte\n");
 		return (0);
 	}
-	printf("Partie sauvegardÃ©e dans %s\n", filename);
+	printf("Partie sauvegarde dans %s\n", filename);
 	return (1);
 }
 
@@ -818,12 +818,12 @@ int	game_load(t_game *game, const char *filename)
 		game->map = map_create();
 		if (!map_load_from_file(game->map, map_filename))
 		{
-			printf("Erreur: impossible de charger la carte sauvegardÃ©e %s\n", map_filename);
+			printf("Erreur: impossible de charger la carte sauvegarde %s\n", map_filename);
 			return (0);
 		}
 	}
 	game_update_camera(game);
-	printf("Partie chargÃ©e depuis %s\n", filename);
+	printf("Partie charge depuis %s\n", filename);
 	return (1);
 }
 
